@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as activities from "../activities.js";
 import type * as seed from "../seed.js";
 import type * as wallet from "../wallet.js";
 
@@ -18,6 +19,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  activities: typeof activities;
   seed: typeof seed;
   wallet: typeof wallet;
 }>;
