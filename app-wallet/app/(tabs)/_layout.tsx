@@ -1,18 +1,13 @@
-import { useState } from 'react'
 import { Tabs } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
-import { getRole } from '../../lib/roleStore'
 
 const TEAL     = '#2A8FA0'
 const INACTIVE = '#D4CDC5'
 
 export default function TabsLayout() {
-  const [role] = useState(() => getRole())
-  const isPartner = role === 'partner'
-
   return (
     <Tabs
-      initialRouteName={isPartner ? 'scanner' : 'index'}
+      initialRouteName="index"
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: TEAL,
@@ -31,29 +26,43 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Discover',
-          href: isPartner ? null : undefined,
+          title: 'Découvrir',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="compass-outline" size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="wallet"
         options={{
           title: 'Wallet',
-          href: isPartner ? null : undefined,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="wallet-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="map"
+        options={{
+          title: 'Carte',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="map-outline" size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="tickets"
         options={{
-          title: 'Tickets',
-          href: isPartner ? null : undefined,
+          title: 'Billets',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="ticket-outline" size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="family"
         options={{
           title: 'Famille',
-          href: isPartner ? null : undefined,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="people-outline" size={size} color={color} />
           ),
@@ -63,21 +72,14 @@ export default function TabsLayout() {
         name="badges"
         options={{
           title: 'Badges',
-          tabBarLabel: '🏅 Badges',
-          href: isPartner ? null : undefined,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="medal-outline" size={size} color={color} />
+          ),
         }}
-      />
-      {/* map hidden for everyone */}
-      <Tabs.Screen
-        name="map"
-        options={{ href: null }}
       />
       <Tabs.Screen
         name="scanner"
-        options={{
-          title: 'Scanner',
-          href: isPartner ? undefined : null,
-        }}
+        options={{ href: null }}
       />
     </Tabs>
   )

@@ -50,7 +50,7 @@ export const applyReferral = mutation({
       poolId = await ctx.db.insert("familyPools", {
         name: `${referrer.name} & famille`,
         ownerId: referrer._id,
-        totalBudgetCHF: 0,
+        totalBudgetLAKE: 0,
       });
       await ctx.db.insert("familyMembers", {
         poolId,

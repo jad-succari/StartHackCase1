@@ -64,14 +64,6 @@ export const bookActivity = mutation({
       externalTicketId,
     });
 
-    await ctx.db.insert("tokenTransactions", {
-      userId,
-      amount: -activity.priceJF,
-      reason: `Réservation : ${activity.title}`,
-      relatedBookingId: bookingId,
-      createdAt: Date.now(),
-    });
-
     return bookingId;
   },
 });

@@ -49,7 +49,7 @@ export const createFamilyPool = mutation({
     const poolId = await ctx.db.insert("familyPools", {
       name,
       ownerId,
-      totalBudgetCHF,
+      totalBudgetLAKE: totalBudgetCHF,
     });
     await ctx.db.insert("familyMembers", {
       poolId,
@@ -143,7 +143,7 @@ export const seedFamilyDemo = mutation({
     const poolId = await ctx.db.insert("familyPools", {
       name: "Famille Dupont",
       ownerId,
-      totalBudgetCHF: 0,
+      totalBudgetLAKE: 0,
     });
 
     await ctx.db.patch(ownerId, { familyPoolId: poolId });

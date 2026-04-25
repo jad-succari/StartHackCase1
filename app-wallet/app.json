@@ -13,7 +13,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "EtherLaken utilise votre position pour afficher les partenaires proches."
+      },
+      "bundleIdentifier": "com.anonymous.app-wallet"
     },
     "android": {
       "adaptiveIcon": {

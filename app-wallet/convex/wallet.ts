@@ -1,6 +1,11 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
 
+function generateTxHash(): string {
+  const hex = "0123456789abcdef";
+  return "0x" + Array.from({ length: 64 }, () => hex[Math.floor(Math.random() * 16)]).join("");
+}
+
 export const getUser = query({
   args: {},
   handler: async (ctx) => {
@@ -11,18 +16,19 @@ export const getUser = query({
 export const getOffers = query({
   args: {},
   handler: async (ctx) => {
-    const offers = await ctx.db.query("offers").collect()
+    const offers = await ctx.db.query("offers").collect();
+    const filtered = offers;
     return await Promise.all(
-      offers.map(async (offer) => {
-        const partner = await ctx.db.get(offer.partnerId)
+      filtered.map(async (offer) => {
+        const partner = await ctx.db.get(offer.partnerId);
         return {
           ...offer,
-          partnerName: partner?.name ?? '',
-          partnerType: partner?.type ?? '',
-          partnerVillage: partner?.village ?? '',
-        }
+          partnerName: offer.partnerName ?? partner?.name ?? "",
+          partnerType: partner?.type ?? "",
+          partnerVillage: partner?.locationName ?? "",
+        };
       })
-    )
+    );
   },
 });
 
@@ -37,10 +43,8 @@ export const getUserBalance = query({
   args: { userId: v.id("users") },
   handler: async (ctx, { userId }) => {
     const user = await ctx.db.get(userId);
-    if (!user) {
-      throw new Error(`User not found: ${userId}`);
-    }
-    return user.greenTokensBalance;
+    if (!user) throw new Error(`User not found: ${userId}`);
+    return user.lakeBalance ?? user.greenTokensBalance;
   },
 });
 
@@ -59,14 +63,18 @@ export const spendTokens = mutation({
     if (!user) throw new Error(`User not found: ${userId}`);
     if (!offer) throw new Error(`Offer not found: ${offerId}`);
 
-    if (user.greenTokensBalance < offer.tokenCost) {
+    const balance = user.lakeBalance ?? user.greenTokensBalance;
+    if (balance < offer.tokenCost) {
       throw new Error(
-        `Insufficient balance: ${user.greenTokensBalance} tokens available, ${offer.tokenCost} required`
+        `Solde insuffisant : ${balance} LAKE disponibles, ${offer.tokenCost} requis`
       );
     }
 
+    const newBalance = balance - offer.tokenCost;
     await ctx.db.patch(userId, {
-      greenTokensBalance: user.greenTokensBalance - offer.tokenCost,
+      lakeBalance: newBalance,
+      greenTokensBalance: newBalance,
+      weeklyScore: (user.weeklyScore ?? 0) + offer.tokenCost,
     });
 
     await ctx.db.insert("transactions", {
@@ -75,6 +83,9 @@ export const spendTokens = mutation({
       offerId,
       timestamp: Date.now(),
       tokensEarnedOrSpent: -offer.tokenCost,
+      txHash: generateTxHash(),
+      type: "spend",
+      amountLAKE: offer.tokenCost,
     });
   },
 });
@@ -83,7 +94,7 @@ export const bookOffer = mutation({
   args: {
     userId: v.id("users"),
     offerId: v.id("offers"),
-    validDate: v.optional(v.string()), // "YYYY-MM-DD"
+    validDate: v.optional(v.string()),
   },
   handler: async (ctx, { userId, offerId, validDate }) => {
     const [user, offer] = await Promise.all([
@@ -94,14 +105,18 @@ export const bookOffer = mutation({
     if (!user) throw new Error(`User not found: ${userId}`);
     if (!offer) throw new Error(`Offer not found: ${offerId}`);
 
-    if (user.greenTokensBalance < offer.tokenCost) {
+    const balance = user.lakeBalance ?? user.greenTokensBalance;
+    if (balance < offer.tokenCost) {
       throw new Error(
-        `Insufficient balance: ${user.greenTokensBalance} tokens available, ${offer.tokenCost} required`
+        `Solde insuffisant : ${balance} LAKE disponibles, ${offer.tokenCost} requis`
       );
     }
 
+    const newBalance = balance - offer.tokenCost;
     await ctx.db.patch(userId, {
-      greenTokensBalance: user.greenTokensBalance - offer.tokenCost,
+      lakeBalance: newBalance,
+      greenTokensBalance: newBalance,
+      weeklyScore: (user.weeklyScore ?? 0) + offer.tokenCost,
     });
 
     await ctx.db.insert("transactions", {
@@ -110,9 +125,12 @@ export const bookOffer = mutation({
       offerId,
       timestamp: Date.now(),
       tokensEarnedOrSpent: -offer.tokenCost,
+      txHash: generateTxHash(),
+      type: "spend",
+      amountLAKE: offer.tokenCost,
     });
 
-    const externalTicketId = `JUNG-${Math.floor(Math.random() * 100000)}`;
+    const externalTicketId = `LAKE-${Math.floor(Math.random() * 100000)}`;
 
     await ctx.db.insert("tickets", {
       userId,
@@ -138,7 +156,7 @@ export const getUserTickets = query({
         const offer = await ctx.db.get(ticket.offerId);
         return {
           ...ticket,
-          offerTitle: offer?.title ?? "Unknown offer",
+          offerTitle: offer?.title ?? "Offre inconnue",
           tokenCost: offer?.tokenCost ?? 0,
           imageUrl: offer?.imageUrl ?? null,
         };
@@ -154,19 +172,19 @@ export const validateTicket = mutation({
     const ticket = tickets.find((t) => t.externalTicketId === externalTicketId);
 
     if (!ticket || ticket.status !== "valide") {
-      return { success: false, message: "Invalid or already used ticket" };
+      return { success: false, message: "Billet invalide ou déjà utilisé" };
     }
 
     if (ticket.validDate) {
       const now = new Date();
       const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
       if (ticket.validDate !== today) {
-        return { success: false, message: `Ticket is only valid on ${ticket.validDate}` };
+        return { success: false, message: `Billet valable uniquement le ${ticket.validDate}` };
       }
     }
 
     await ctx.db.patch(ticket._id, { status: "utilisé" });
-    return { success: true, message: "Ticket validated!" };
+    return { success: true, message: "Billet validé !" };
   },
 });
 
@@ -174,19 +192,32 @@ export const cancelTicket = mutation({
   args: { ticketId: v.id("tickets") },
   handler: async (ctx, { ticketId }) => {
     const ticket = await ctx.db.get(ticketId);
-    if (!ticket) throw new Error("Ticket not found");
-    if (ticket.status !== "valide") throw new Error("This ticket cannot be cancelled");
+    if (!ticket) throw new Error("Billet introuvable");
+    if (ticket.status !== "valide") throw new Error("Ce billet ne peut pas être annulé");
 
     const [user, offer] = await Promise.all([
       ctx.db.get(ticket.userId),
       ctx.db.get(ticket.offerId),
     ]);
 
-    if (!user) throw new Error("User not found");
+    if (!user) throw new Error("Utilisateur introuvable");
 
     if (offer) {
+      const balance = user.lakeBalance ?? user.greenTokensBalance;
+      const newBalance = balance + offer.tokenCost;
       await ctx.db.patch(ticket.userId, {
-        greenTokensBalance: user.greenTokensBalance + offer.tokenCost,
+        lakeBalance: newBalance,
+        greenTokensBalance: newBalance,
+      });
+      await ctx.db.insert("transactions", {
+        userId: ticket.userId,
+        partnerId: offer.partnerId,
+        offerId: ticket.offerId,
+        timestamp: Date.now(),
+        tokensEarnedOrSpent: offer.tokenCost,
+        txHash: generateTxHash(),
+        type: "cashback",
+        amountLAKE: offer.tokenCost,
       });
     }
 
@@ -199,13 +230,19 @@ export const addTokens = mutation({
   handler: async (ctx, { userId, amount }) => {
     const user = await ctx.db.get(userId);
     if (!user) throw new Error(`User not found: ${userId}`);
+    const balance = user.lakeBalance ?? user.greenTokensBalance;
+    const newBalance = balance + amount;
     await ctx.db.patch(userId, {
-      greenTokensBalance: user.greenTokensBalance + amount,
+      lakeBalance: newBalance,
+      greenTokensBalance: newBalance,
     });
     await ctx.db.insert("transactions", {
       userId,
       timestamp: Date.now(),
       tokensEarnedOrSpent: amount,
+      txHash: generateTxHash(),
+      type: "earn",
+      amountLAKE: amount,
     });
   },
 });
@@ -220,8 +257,8 @@ export const getAdminStats = query({
       ctx.db.query("payouts").collect(),
     ]);
 
-    const totalTokensInCirculation = users.reduce(
-      (sum, u) => sum + u.greenTokensBalance,
+    const totalLAKEInCirculation = users.reduce(
+      (sum, u) => sum + (u.lakeBalance ?? u.greenTokensBalance),
       0
     );
 
@@ -234,17 +271,19 @@ export const getAdminStats = query({
         .filter((p) => p.partnerId === partner._id)
         .reduce((sum, p) => sum + p.amountTokens, 0);
 
-      const pendingTokens = Math.max(0, earned - paidOut);
-
       return {
         _id: partner._id,
         name: partner.name,
         type: partner.type,
-        pendingTokens,
+        pendingTokens: Math.max(0, earned - paidOut),
       };
     });
 
-    return { totalTokensInCirculation, partners: partnersWithBalance };
+    return {
+      totalLAKEInCirculation,
+      totalTokensInCirculation: totalLAKEInCirculation,
+      partners: partnersWithBalance,
+    };
   },
 });
 
@@ -253,10 +292,7 @@ export const settlePartnerAccount = mutation({
   handler: async (ctx, { partnerId }) => {
     const [transactions, payouts] = await Promise.all([
       ctx.db.query("transactions").collect(),
-      ctx.db
-        .query("payouts")
-        .withIndex("by_partnerId", (q) => q.eq("partnerId", partnerId))
-        .collect(),
+      ctx.db.query("payouts").withIndex("by_partnerId", (q) => q.eq("partnerId", partnerId)).collect(),
     ]);
 
     const earned = transactions
@@ -265,7 +301,6 @@ export const settlePartnerAccount = mutation({
 
     const paidOut = payouts.reduce((sum, p) => sum + p.amountTokens, 0);
     const pending = earned - paidOut;
-
     if (pending <= 0) return;
 
     await ctx.db.insert("payouts", {
@@ -283,21 +318,24 @@ export const getUserTransactions = query({
       .query("transactions")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .order("desc")
-      .collect()
+      .collect();
 
     return await Promise.all(
       txs.map(async (tx) => {
-        const offer = tx.offerId ? await ctx.db.get(tx.offerId) : null
+        const offer = tx.offerId ? await ctx.db.get(tx.offerId) : null;
         return {
           _id: tx._id,
           timestamp: tx.timestamp,
           tokensEarnedOrSpent: tx.tokensEarnedOrSpent,
-          label: offer?.title ?? (tx.tokensEarnedOrSpent > 0 ? 'Token purchase' : 'Tokens spent'),
-        }
+          amountLAKE: tx.amountLAKE ?? Math.abs(tx.tokensEarnedOrSpent),
+          type: tx.type ?? (tx.tokensEarnedOrSpent > 0 ? "earn" : "spend"),
+          txHash: tx.txHash,
+          label: offer?.title ?? (tx.tokensEarnedOrSpent > 0 ? "Récompense LAKE" : "Dépense LAKE"),
+        };
       })
-    )
+    );
   },
-})
+});
 
 export const earnTokens = mutation({
   args: {
@@ -306,15 +344,17 @@ export const earnTokens = mutation({
     partnerId: v.id("partners"),
   },
   handler: async (ctx, { userId, amount, partnerId }) => {
-    if (amount <= 0) {
-      throw new Error(`Amount must be positive, got: ${amount}`);
-    }
+    if (amount <= 0) throw new Error(`Le montant doit être positif, reçu : ${amount}`);
 
     const user = await ctx.db.get(userId);
     if (!user) throw new Error(`User not found: ${userId}`);
 
+    const balance = user.lakeBalance ?? user.greenTokensBalance;
+    const newBalance = balance + amount;
     await ctx.db.patch(userId, {
-      greenTokensBalance: user.greenTokensBalance + amount,
+      lakeBalance: newBalance,
+      greenTokensBalance: newBalance,
+      weeklyScore: (user.weeklyScore ?? 0) + amount,
     });
 
     await ctx.db.insert("transactions", {
@@ -322,6 +362,9 @@ export const earnTokens = mutation({
       partnerId,
       timestamp: Date.now(),
       tokensEarnedOrSpent: amount,
+      txHash: generateTxHash(),
+      type: "earn",
+      amountLAKE: amount,
     });
   },
 });
@@ -342,7 +385,7 @@ export const getBadges = query({
         return {
           ...t,
           partnerType: partner?.type ?? "",
-          isEcoCertified: partner?.isEcoCertified ?? false,
+          isEco: partner?.isEco ?? false,
         };
       })
     );
@@ -353,21 +396,21 @@ export const getBadges = query({
       .reduce((sum, t) => sum + Math.abs(t.tokensEarnedOrSpent), 0);
 
     const types = new Set(enriched.map((t) => t.partnerType));
-    const balance = user?.greenTokensBalance ?? 0;
+    const balance = user ? (user.lakeBalance ?? user.greenTokensBalance) : 0;
 
     return [
-      { id: "first", emoji: "🎫", title: "First Adventure", desc: "Book your first offer", unlocked: count >= 1 },
-      { id: "ski", emoji: "🎿", title: "Ski Enthusiast", desc: "Book a ski offer", unlocked: enriched.some((t) => t.partnerType === "ski") },
-      { id: "eco", emoji: "🌱", title: "Eco Pioneer", desc: "Book an eco-certified activity", unlocked: enriched.some((t) => t.isEcoCertified) },
-      { id: "restaurant", emoji: "🍽️", title: "Gourmet Explorer", desc: "Book a restaurant experience", unlocked: enriched.some((t) => t.partnerType === "restaurant") },
-      { id: "transport", emoji: "🚠", title: "Transport Hero", desc: "Book a transport offer", unlocked: enriched.some((t) => t.partnerType === "transport") },
-      { id: "blazer", emoji: "🥾", title: "Trail Blazer", desc: "Book 3 offers", unlocked: count >= 3 },
-      { id: "collector", emoji: "🎯", title: "Collector", desc: "Book 5 offers", unlocked: count >= 5 },
-      { id: "legend", emoji: "🌟", title: "Jungfrau Legend", desc: "Book 10 offers", unlocked: count >= 10 },
-      { id: "spender", emoji: "💸", title: "Big Spender", desc: "Spend 100 GT", unlocked: totalSpent >= 100 },
-      { id: "summit", emoji: "🏔️", title: "Summit Chaser", desc: "Spend 500 GT total", unlocked: totalSpent >= 500 },
-      { id: "vip", emoji: "💎", title: "VIP", desc: "Hold 200+ GT in your wallet", unlocked: balance >= 200 },
-      { id: "explorer", emoji: "🏆", title: "True Explorer", desc: "Book offers in 3 different categories", unlocked: types.size >= 3 },
+      { id: "first", emoji: "🎫", title: "Première Aventure", desc: "Réserver votre première offre", unlocked: count >= 1 },
+      { id: "ski", emoji: "🎿", title: "Passionné de Ski", desc: "Réserver une offre ski", unlocked: enriched.some((t) => t.partnerType === "ski") },
+      { id: "eco", emoji: "🌱", title: "Éco Pionnier", desc: "Réserver une activité éco-certifiée", unlocked: enriched.some((t) => t.isEco) },
+      { id: "restaurant", emoji: "🍽️", title: "Explorateur Gourmet", desc: "Réserver une expérience restaurant", unlocked: enriched.some((t) => t.partnerType === "restaurant") },
+      { id: "transport", emoji: "🚠", title: "Héros du Transport", desc: "Réserver une offre transport", unlocked: enriched.some((t) => t.partnerType === "transport") },
+      { id: "blazer", emoji: "🥾", title: "Trail Blazer", desc: "Réserver 3 offres", unlocked: count >= 3 },
+      { id: "collector", emoji: "🎯", title: "Collectionneur", desc: "Réserver 5 offres", unlocked: count >= 5 },
+      { id: "legend", emoji: "🌟", title: "Légende Jungfrau", desc: "Réserver 10 offres", unlocked: count >= 10 },
+      { id: "spender", emoji: "💸", title: "Grand Dépensier", desc: "Dépenser 100 LAKE", unlocked: totalSpent >= 100 },
+      { id: "summit", emoji: "🏔️", title: "Chasseur de Sommets", desc: "Dépenser 500 LAKE au total", unlocked: totalSpent >= 500 },
+      { id: "vip", emoji: "💎", title: "VIP", desc: "Détenir 200+ LAKE dans votre wallet", unlocked: balance >= 200 },
+      { id: "explorer", emoji: "🏆", title: "Vrai Explorateur", desc: "Réserver dans 3 catégories différentes", unlocked: types.size >= 3 },
     ];
   },
 });

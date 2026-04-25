@@ -3,52 +3,101 @@ import { v } from "convex/values";
 
 export default defineSchema({
   users: defineTable({
+    isTourist: v.optional(v.boolean()),
     name: v.string(),
     email: v.string(),
-    role: v.optional(v.union(v.literal("tourist"), v.literal("partner"), v.literal("admin"))),
+    // Legacy field kept for compat — lakeBalance is source of truth
     greenTokensBalance: v.number(),
-    jfBalance: v.optional(v.number()),
-    passSerialNumber: v.optional(v.string()),
-    isTourist: v.optional(v.boolean()),
-    phone: v.optional(v.string()),
-    stayStart: v.optional(v.string()),
-    stayEnd: v.optional(v.string()),
-    hotelName: v.optional(v.string()),
+    // Web3 (simulated Safe Smart Account on Gnosis Chain)
+    safeAddress: v.optional(v.string()),
+    lakeBalance: v.optional(v.number()),
+    // Referral
     referralCode: v.optional(v.string()),
     referredBy: v.optional(v.id("users")),
-    isActivated: v.optional(v.boolean()),
+    // Family
     familyPoolId: v.optional(v.id("familyPools")),
+    // Activity
+    weeklyScore: v.optional(v.number()),
+    isActivated: v.optional(v.boolean()),
+    // Legacy fields kept for auth/registration compat
+    role: v.optional(v.union(v.literal("tourist"), v.literal("partner"), v.literal("admin"))),
+    phone: v.optional(v.string()),
+    hotelName: v.optional(v.string()),
+    stayStart: v.optional(v.string()),
+    stayEnd: v.optional(v.string()),
   })
     .index("by_email", ["email"])
     .index("by_referral_code", ["referralCode"])
     .index("by_family_pool", ["familyPoolId"]),
 
+  partners: defineTable({
+    name: v.string(),
+    type: v.string(),
+    category: v.optional(v.string()),
+    location: v.string(),
+    locationName: v.optional(v.string()),
+    lat: v.optional(v.number()),
+    lng: v.optional(v.number()),
+    isEco: v.optional(v.boolean()),
+  }),
+
+  offers: defineTable({
+    partnerId: v.id("partners"),
+    title: v.string(),
+    description: v.string(),
+    tokenCost: v.number(),
+    discountPercentage: v.number(),
+    category: v.optional(v.string()),
+    partnerName: v.optional(v.string()),
+    locationName: v.optional(v.string()),
+    isEco: v.optional(v.boolean()),
+    savingsCHF: v.optional(v.number()),
+    imageUrl: v.optional(v.string()),
+  }).index("by_partnerId", ["partnerId"]),
+
+  transactions: defineTable({
+    userId: v.id("users"),
+    partnerId: v.optional(v.id("partners")),
+    offerId: v.optional(v.id("offers")),
+    timestamp: v.number(),
+    tokensEarnedOrSpent: v.number(),
+    // Web3 fields (simulated)
+    txHash: v.optional(v.string()),
+    type: v.optional(v.string()),
+    amountLAKE: v.optional(v.number()),
+  }).index("by_userId", ["userId"]),
+
   familyPools: defineTable({
     name: v.string(),
     ownerId: v.id("users"),
-    totalBudgetCHF: v.number(),
-    memberBudgets: v.optional(v.record(v.string(), v.number())),
-  }).index("by_ownerId", ["ownerId"]),
+    totalBudgetLAKE: v.number(),
+  })
+    .index("by_owner", ["ownerId"])
+    .index("by_ownerId", ["ownerId"]),
 
   familyMembers: defineTable({
     poolId: v.id("familyPools"),
     userId: v.id("users"),
-    allocatedBudgetCHF: v.number(),
+    allocatedBudgetCHF: v.optional(v.number()),
   })
     .index("by_pool", ["poolId"])
     .index("by_user", ["userId"]),
 
-  partners: defineTable({
-    name: v.string(),
-    type: v.string(),
-    description: v.optional(v.string()),
-    village: v.optional(v.string()),
-    location: v.optional(v.string()),
-    latitude: v.optional(v.number()),
-    longitude: v.optional(v.number()),
-    isEcoCertified: v.optional(v.boolean()),
-    isActive: v.optional(v.boolean()),
-  }),
+  // Legacy tables — kept for wallet booking/ticket/payout flows
+  tickets: defineTable({
+    userId: v.id("users"),
+    offerId: v.id("offers"),
+    externalTicketId: v.string(),
+    status: v.string(),
+    purchasedAt: v.number(),
+    validDate: v.optional(v.string()),
+  }).index("by_userId", ["userId"]),
+
+  payouts: defineTable({
+    partnerId: v.id("partners"),
+    amountTokens: v.number(),
+    settledAt: v.number(),
+  }).index("by_partnerId", ["partnerId"]),
 
   activities: defineTable({
     partnerId: v.id("partners"),
@@ -81,46 +130,4 @@ export default defineSchema({
     .index("by_userId", ["userId"])
     .index("by_partnerId", ["partnerId"])
     .index("by_userId_and_status", ["userId", "status"]),
-
-  tokenTransactions: defineTable({
-    userId: v.id("users"),
-    amount: v.number(),
-    reason: v.string(),
-    relatedBookingId: v.optional(v.id("bookings")),
-    createdAt: v.number(),
-  }).index("by_userId", ["userId"]),
-
-  offers: defineTable({
-    partnerId: v.id("partners"),
-    title: v.string(),
-    description: v.string(),
-    tokenCost: v.number(),
-    originalPriceCHF: v.optional(v.number()),
-    imageUrl: v.optional(v.string()),
-    isActive: v.optional(v.boolean()),
-    discountPercentage: v.optional(v.number()),
-  }).index("by_partnerId", ["partnerId"]),
-
-  transactions: defineTable({
-    userId: v.id("users"),
-    partnerId: v.optional(v.id("partners")),
-    offerId: v.optional(v.id("offers")),
-    timestamp: v.number(),
-    tokensEarnedOrSpent: v.number(),
-  }).index("by_userId", ["userId"]),
-
-  tickets: defineTable({
-    userId: v.id("users"),
-    offerId: v.id("offers"),
-    externalTicketId: v.string(),
-    status: v.string(),
-    purchasedAt: v.number(),
-    validDate: v.optional(v.string()),
-  }).index("by_userId", ["userId"]),
-
-  payouts: defineTable({
-    partnerId: v.id("partners"),
-    amountTokens: v.number(),
-    settledAt: v.number(),
-  }).index("by_partnerId", ["partnerId"]),
 });
