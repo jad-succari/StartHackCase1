@@ -52,6 +52,8 @@ export default defineSchema({
     locationName: v.optional(v.string()),
     isEco: v.optional(v.boolean()),
     savingsCHF: v.optional(v.number()),
+    originalPriceCHF: v.optional(v.number()),
+    isActive: v.optional(v.boolean()),
     imageUrl: v.optional(v.string()),
   }).index("by_partnerId", ["partnerId"]),
 
@@ -70,9 +72,10 @@ export default defineSchema({
   familyPools: defineTable({
     name: v.string(),
     ownerId: v.id("users"),
-    totalBudgetLAKE: v.number(),
+    totalBudgetLAKE: v.optional(v.number()),
+    totalBudgetCHF: v.optional(v.number()),
   })
-    .index("by_owner", ["ownerId"])
+  
     .index("by_ownerId", ["ownerId"]),
 
   familyMembers: defineTable({

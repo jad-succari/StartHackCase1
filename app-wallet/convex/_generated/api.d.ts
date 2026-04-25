@@ -15,6 +15,7 @@ import type * as partners from "../partners.js";
 import type * as referral from "../referral.js";
 import type * as seed from "../seed.js";
 import type * as wallet from "../wallet.js";
+import type * as web3 from "../web3.js";
 
 import type {
   ApiFromModules,
@@ -30,6 +31,7 @@ declare const fullApi: ApiFromModules<{
   referral: typeof referral;
   seed: typeof seed;
   wallet: typeof wallet;
+  web3: typeof web3;
 }>;
 
 /**
