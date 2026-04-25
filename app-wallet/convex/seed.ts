@@ -11,48 +11,102 @@ function generateTxHash(): string {
 }
 
 async function runInsertLogic(ctx: any) {
-  const jungfraubahnId = await ctx.db.insert("partners", {
-    name: "Jungfraubahn",
+  // ── Real Jungfrau Region Partners with accurate GPS ──────────────────────────
+
+  const jungfrauRailId = await ctx.db.insert("partners", {
+    name: "Jungfrau Railways",
     type: "transport",
     category: "Transport",
     location: "Grindelwald, CH",
     locationName: "Grindelwald",
-    lat: 46.5751,
-    lng: 7.9857,
+    lat: 46.6244,
+    lng: 8.0409,
     isEco: true,
+    description: "Mountain railways connecting Grindelwald to Jungfraujoch — Top of Europe at 3,454 m",
   });
 
-  const allmendbahnId = await ctx.db.insert("partners", {
-    name: "Allmendbahn Mürren",
+  const maennlichenId = await ctx.db.insert("partners", {
+    name: "Gondelbahn Grindelwald-Männlichen",
     type: "transport",
     category: "Transport",
-    location: "Mürren, CH",
-    locationName: "Mürren",
-    lat: 46.5592,
-    lng: 7.8986,
+    location: "Grindelwald, CH",
+    locationName: "Grindelwald",
+    lat: 46.6199,
+    lng: 8.0401,
     isEco: true,
+    description: "Europe's longest gondola ropeway (6.2 km) from Grindelwald to Männlichen summit at 2,229 m",
   });
 
-  const murrenSportsId = await ctx.db.insert("partners", {
-    name: "Mürren Alpine Sports",
+  const gletscherschluchtId = await ctx.db.insert("partners", {
+    name: "Gletscherschlucht Grindelwald",
     type: "activity",
     category: "Activity",
-    location: "Mürren, CH",
-    locationName: "Mürren",
-    lat: 46.5605,
-    lng: 7.8930,
+    location: "Grindelwald, CH",
+    locationName: "Grindelwald",
+    lat: 46.6131,
+    lng: 8.0322,
     isEco: false,
+    description: "Natural gorge carved by the Lower Grindelwald Glacier with dramatic 300m rock walls",
   });
 
-  const jungfrauTourismId = await ctx.db.insert("partners", {
-    name: "Jungfrau Tourism",
+  const trümmelbachId = await ctx.db.insert("partners", {
+    name: "Trümmelbach Gletscherwasserfälle",
     type: "activity",
     category: "Activity",
-    location: "Interlaken, CH",
-    locationName: "Interlaken",
-    lat: 46.6863,
-    lng: 7.8632,
+    location: "Lauterbrunnen, CH",
+    locationName: "Lauterbrunnen",
+    lat: 46.5614,
+    lng: 7.9113,
     isEco: true,
+    description: "Europe's largest subterranean waterfalls inside the mountain — 20,000 L/s draining the Jungfrau glaciers",
+  });
+
+  const aareschluchtId = await ctx.db.insert("partners", {
+    name: "Aareschlucht AG",
+    type: "activity",
+    category: "Activity",
+    location: "Meiringen, CH",
+    locationName: "Meiringen",
+    lat: 46.72005,
+    lng: 8.20461,
+    isEco: true,
+    description: "Spectacular 1.4 km gorge up to 200m deep carved by the Aare river — between Meiringen and Innertkirchen",
+  });
+
+  const beatusId = await ctx.db.insert("partners", {
+    name: "St. Beatus-Höhlen",
+    type: "activity",
+    category: "Activity",
+    location: "Sundlauenen, CH",
+    locationName: "Sundlauenen",
+    lat: 46.6849027,
+    lng: 7.7812703,
+    isEco: true,
+    description: "Fascinating stalactite cave system above Lake Thun — 1 km guided tour with underground waterfalls and cave museum",
+  });
+
+  const ballenbergId = await ctx.db.insert("partners", {
+    name: "Freilichtmuseum Ballenberg",
+    type: "activity",
+    category: "Activity",
+    location: "Hofstetten bei Brienz, CH",
+    locationName: "Brienz",
+    lat: 46.7455,
+    lng: 8.0633,
+    isEco: true,
+    description: "Open-air museum with 100 authentic Swiss rural buildings from across Switzerland on 66 hectares",
+  });
+
+  const airGlaciersId = await ctx.db.insert("partners", {
+    name: "Air-Glaciers SA",
+    type: "activity",
+    category: "Activity",
+    location: "Lauterbrunnen, CH",
+    locationName: "Lauterbrunnen",
+    lat: 46.5948,
+    lng: 7.9087,
+    isEco: false,
+    description: "Alpine helicopter tours over the Jungfrau massif and Matterhorn — the most spectacular aerial Alpine experience",
   });
 
   const grindelwaldSportsId = await ctx.db.insert("partners", {
@@ -62,189 +116,218 @@ async function runInsertLogic(ctx: any) {
     location: "Grindelwald, CH",
     locationName: "Grindelwald",
     lat: 46.6244,
-    lng: 8.0409,
+    lng: 8.0500,
     isEco: false,
+    description: "Ski rental, lessons and day passes for the Kleine Scheidegg–Männlichen ski area — 213 km of pistes",
   });
 
-  await ctx.db.insert("offers", {
-    partnerId: jungfraubahnId,
-    title: "Hiking trail day pass Lauterbrunnen",
-    partnerName: "Jungfraubahn",
-    category: "Activity",
-    locationName: "Grindelwald",
+  const schwarzwaldalpId = await ctx.db.insert("partners", {
+    name: "Chalet Schwarzwaldalp",
+    type: "restaurant",
+    category: "Restaurant",
+    location: "Rosenlaui, CH",
+    locationName: "Meiringen",
+    lat: 46.7273,
+    lng: 8.1040,
     isEco: true,
-    isActive: true,
-    description: "Round-trip hiking day pass through the scenic Lauterbrunnen valley trails",
-    tokenCost: 14,
-    discountPercentage: 31,
-    originalPriceCHF: 29,
-    imageUrl: "https://picsum.photos/seed/hike1/300/200",
+    description: "Historic alpine restaurant in the Rosenlaui valley — traditional Swiss cuisine with local cheese and homemade specialties",
   });
 
+  // ── 12 Real Offers from the Jungfrau Region Guest Card Program ───────────────
+
   await ctx.db.insert("offers", {
-    partnerId: jungfraubahnId,
-    title: "Cable car ticket from Wengen",
-    partnerName: "Jungfraubahn",
+    partnerId: jungfrauRailId,
+    title: "Grindelwald First gondola — return trip",
+    partnerName: "Jungfrau Railways",
     category: "Transport",
     locationName: "Grindelwald",
     isEco: true,
     isActive: true,
-    description: "Cable car ticket from Wengen to the alpine viewpoint with stunning Eiger views",
-    tokenCost: 14,
+    description: "Round-trip gondola to Grindelwald First at 2,168 m — gateway to ziplines, cliff walk and alpine hiking",
+    tokenCost: 19,
+    discountPercentage: 15,
+    originalPriceCHF: 44,
+    savingsCHF: 7,
+    imageUrl: "https://picsum.photos/seed/first1/300/200",
+  });
+
+  await ctx.db.insert("offers", {
+    partnerId: jungfrauRailId,
+    title: "First Cliff Walk & First Flyer access",
+    partnerName: "Jungfrau Railways",
+    category: "Activity",
+    locationName: "Grindelwald",
+    isEco: true,
+    isActive: true,
+    description: "Access to the spectacular First Cliff Walk suspension bridge and First Flyer zipline at 2,168 m altitude",
+    tokenCost: 15,
+    discountPercentage: 15,
+    originalPriceCHF: 35,
+    savingsCHF: 5,
+    imageUrl: "https://picsum.photos/seed/cliffwalk1/300/200",
+  });
+
+  await ctx.db.insert("offers", {
+    partnerId: maennlichenId,
+    title: "Gondola Grindelwald → Männlichen — return",
+    partnerName: "Gondelbahn Grindelwald-Männlichen",
+    category: "Transport",
+    locationName: "Grindelwald",
+    isEco: true,
+    isActive: true,
+    description: "Return ticket on Europe's longest gondola ropeway to Männlichen (2,229 m) — panoramic Eiger, Mönch & Jungfrau views",
+    tokenCost: 15,
+    discountPercentage: 30,
+    originalPriceCHF: 44,
+    savingsCHF: 13,
+    imageUrl: "https://picsum.photos/seed/maennlichen1/300/200",
+  });
+
+  await ctx.db.insert("offers", {
+    partnerId: gletscherschluchtId,
+    title: "Gletscherschlucht Grindelwald — gorge admission",
+    partnerName: "Gletscherschlucht Grindelwald",
+    category: "Activity",
+    locationName: "Grindelwald",
+    isEco: false,
+    isActive: true,
+    description: "Entry to the dramatic glacial gorge with 300m rock walls carved by the Lower Grindelwald Glacier",
+    tokenCost: 5,
+    discountPercentage: 17,
+    originalPriceCHF: 12,
+    savingsCHF: 2,
+    imageUrl: "https://picsum.photos/seed/gorge1/300/200",
+  });
+
+  await ctx.db.insert("offers", {
+    partnerId: trümmelbachId,
+    title: "Trümmelbach glacier waterfalls — entry ticket",
+    partnerName: "Trümmelbach Gletscherwasserfälle",
+    category: "Activity",
+    locationName: "Lauterbrunnen",
+    isEco: true,
+    isActive: true,
+    description: "10 glacier waterfalls inside the mountain — Europe's largest subterranean falls up to 20,000 L/s",
+    tokenCost: 6,
+    discountPercentage: 8,
+    originalPriceCHF: 14,
+    savingsCHF: 1,
+    imageUrl: "https://picsum.photos/seed/trummel1/300/200",
+  });
+
+  await ctx.db.insert("offers", {
+    partnerId: aareschluchtId,
+    title: "Aareschlucht gorge walk — adult ticket",
+    partnerName: "Aareschlucht AG",
+    category: "Activity",
+    locationName: "Meiringen",
+    isEco: true,
+    isActive: true,
+    description: "1.4 km walk through the spectacular Aare gorge up to 200m deep — turquoise water and dramatic rock formations",
+    tokenCost: 5,
     discountPercentage: 20,
-    originalPriceCHF: 29,
-    imageUrl: "https://picsum.photos/seed/wengen1/300/200",
+    originalPriceCHF: 11,
+    savingsCHF: 2,
+    imageUrl: "https://picsum.photos/seed/aareschlucht1/300/200",
   });
 
   await ctx.db.insert("offers", {
-    partnerId: jungfrauTourismId,
-    title: "Virtual guided tour of Jungfrau region",
-    partnerName: "Jungfrau Tourism",
+    partnerId: beatusId,
+    title: "St. Beatus-Höhlen — cave tour + museum",
+    partnerName: "St. Beatus-Höhlen",
     category: "Activity",
-    locationName: "Interlaken",
+    locationName: "Sundlauenen",
     isEco: true,
     isActive: true,
-    description: "Full-day virtual guided tour covering all the highlights of the Jungfrau region",
-    tokenCost: 125,
-    discountPercentage: 34,
-    originalPriceCHF: 250,
-    imageUrl: "https://picsum.photos/seed/virtual1/300/200",
+    description: "Guided tour through 1 km of stalactite caves above Lake Thun — underground waterfalls and cave museum included",
+    tokenCost: 9,
+    discountPercentage: 10,
+    originalPriceCHF: 20,
+    savingsCHF: 2,
+    imageUrl: "https://picsum.photos/seed/beatus1/300/200",
   });
 
   await ctx.db.insert("offers", {
-    partnerId: jungfrauTourismId,
-    title: "Personal travel planning session",
-    partnerName: "Jungfrau Tourism",
+    partnerId: ballenbergId,
+    title: "Freilichtmuseum Ballenberg — full-day pass",
+    partnerName: "Freilichtmuseum Ballenberg",
     category: "Activity",
-    locationName: "Interlaken",
+    locationName: "Brienz",
     isEco: true,
     isActive: true,
-    description: "One-on-one travel planning with a local Jungfrau region expert for a personalized itinerary",
-    tokenCost: 100,
-    discountPercentage: 16,
-    originalPriceCHF: 200,
-    imageUrl: "https://picsum.photos/seed/travel1/300/200",
+    description: "Explore 100 authentic rural Swiss buildings on 66 hectares — Europe's largest open-air museum near Brienz",
+    tokenCost: 12,
+    discountPercentage: 25,
+    originalPriceCHF: 32,
+    savingsCHF: 8,
+    imageUrl: "https://picsum.photos/seed/ballenberg1/300/200",
   });
 
   await ctx.db.insert("offers", {
-    partnerId: jungfrauTourismId,
-    title: "Mountain guide consultation",
-    partnerName: "Jungfrau Tourism",
+    partnerId: airGlaciersId,
+    title: "Helicopter panorama flight — Jungfrau massif (30 min)",
+    partnerName: "Air-Glaciers SA",
     category: "Activity",
-    locationName: "Interlaken",
-    isEco: true,
-    isActive: true,
-    description: "45 minutes of expert mountain guide consultation for your Jungfrau adventure",
-    tokenCost: 42,
-    discountPercentage: 21,
-    originalPriceCHF: 80,
-    imageUrl: "https://picsum.photos/seed/guide1/300/200",
-  });
-
-  await ctx.db.insert("offers", {
-    partnerId: murrenSportsId,
-    title: "Tandem paragliding Lauterbrunnen valley",
-    partnerName: "Mürren Alpine Sports",
-    category: "Activity",
-    locationName: "Mürren",
+    locationName: "Lauterbrunnen",
     isEco: false,
     isActive: true,
-    description: "Thrilling tandem paragliding flight over the Lauterbrunnen valley with a certified pilot",
-    tokenCost: 42,
-    discountPercentage: 31,
-    originalPriceCHF: 190,
-    imageUrl: "https://picsum.photos/seed/parapente1/300/200",
+    description: "30-minute helicopter flight over the Jungfrau, Eiger and Mönch glaciers — the most breathtaking view in the Alps",
+    tokenCost: 126,
+    discountPercentage: 10,
+    originalPriceCHF: 280,
+    savingsCHF: 28,
+    imageUrl: "https://picsum.photos/seed/heli1/300/200",
   });
 
   await ctx.db.insert("offers", {
-    partnerId: allmendbahnId,
-    title: "Schilthorn Piz Gloria dining experience",
-    partnerName: "Allmendbahn Mürren",
-    category: "Restaurant",
-    locationName: "Mürren",
+    partnerId: airGlaciersId,
+    title: "Eiger north face helicopter tour (13 min)",
+    partnerName: "Air-Glaciers SA",
+    category: "Activity",
+    locationName: "Lauterbrunnen",
     isEco: false,
     isActive: true,
-    description: "Traditional Swiss alpine dining at the iconic Schilthorn Piz Gloria revolving restaurant",
-    tokenCost: 60,
-    discountPercentage: 19,
-    originalPriceCHF: 321,
-    imageUrl: "https://picsum.photos/seed/restaurant1/300/200",
+    description: "13-minute aerial tour around the legendary north face of the Eiger — a legendary bucket-list experience",
+    tokenCost: 63,
+    discountPercentage: 10,
+    originalPriceCHF: 140,
+    savingsCHF: 14,
+    imageUrl: "https://picsum.photos/seed/heli2/300/200",
   });
 
   await ctx.db.insert("offers", {
     partnerId: grindelwaldSportsId,
-    title: "Grindelwald First ski day pass",
+    title: "Kleine Scheidegg–Männlichen — ski day pass",
     partnerName: "Grindelwald Sports",
     category: "Ski",
     locationName: "Grindelwald",
     isEco: false,
     isActive: true,
-    description: "Full-day ski access to Grindelwald First with stunning views of the Eiger, Mönch and Jungfrau",
-    tokenCost: 90,
+    description: "Full-day ski access to the Kleine Scheidegg–Männlichen area — 213 km of pistes with direct views of the Eiger north face",
+    tokenCost: 29,
     discountPercentage: 25,
-    originalPriceCHF: 180,
-    imageUrl: "https://picsum.photos/seed/ski1/300/200",
+    originalPriceCHF: 78,
+    savingsCHF: 20,
+    imageUrl: "https://picsum.photos/seed/ski2/300/200",
   });
 
   await ctx.db.insert("offers", {
-    partnerId: allmendbahnId,
-    title: "Almendbahn ticket from Mürren or Stechelberg",
-    partnerName: "Allmendbahn Mürren",
-    category: "Transport",
-    locationName: "Mürren",
+    partnerId: schwarzwaldalpId,
+    title: "Zvieriplättli — alpine snack platter",
+    partnerName: "Chalet Schwarzwaldalp",
+    category: "Restaurant",
+    locationName: "Meiringen",
     isEco: true,
     isActive: true,
-    description: "Cable car access to the beautiful Allmendhuben alpine meadows above Mürren",
-    tokenCost: 8,
-    discountPercentage: 28,
-    originalPriceCHF: 16,
-    imageUrl: "https://picsum.photos/seed/cable1/300/200",
+    description: "Traditional Swiss snack platter with local cheese, dried meats and bread at Chalet Schwarzwaldalp — weekdays 14:30–16:00",
+    tokenCost: 6,
+    discountPercentage: 33,
+    originalPriceCHF: 18,
+    savingsCHF: 6,
+    imageUrl: "https://picsum.photos/seed/schwarzwaldalp1/300/200",
   });
 
-  await ctx.db.insert("offers", {
-    partnerId: allmendbahnId,
-    title: "Schilthorn ticket from Mürren or Stechelberg",
-    partnerName: "Allmendbahn Mürren",
-    category: "Transport",
-    locationName: "Mürren",
-    isEco: true,
-    isActive: true,
-    description: "Round trip cable car ticket from Stechelberg or Mürren to Schilthorn with 360° panoramic views",
-    tokenCost: 34,
-    discountPercentage: 28,
-    originalPriceCHF: 69,
-    imageUrl: "https://picsum.photos/seed/schilthorn1/300/200",
-  });
-
-  await ctx.db.insert("offers", {
-    partnerId: allmendbahnId,
-    title: "Allmendhuben family fun including train ticket and lunch",
-    partnerName: "Allmendbahn Mürren",
-    category: "Activity",
-    locationName: "Mürren",
-    isEco: true,
-    isActive: true,
-    description: "Family adventure with train ticket to Allmendhuben and alpine lunch included",
-    tokenCost: 43,
-    discountPercentage: 15,
-    originalPriceCHF: 79,
-    imageUrl: "https://picsum.photos/seed/family1/300/200",
-  });
-
-  await ctx.db.insert("offers", {
-    partnerId: murrenSportsId,
-    title: "Mürren via ferrata for beginners",
-    partnerName: "Mürren Alpine Sports",
-    category: "Activity",
-    locationName: "Mürren",
-    isEco: false,
-    isActive: true,
-    description: "Guided via ferrata adventure in Mürren for first-timers with professional guide",
-    tokenCost: 90,
-    discountPercentage: 18,
-    originalPriceCHF: 175,
-    imageUrl: "https://picsum.photos/seed/ferrata1/300/200",
-  });
+  // ── Demo user: Alex, 1890 GT ────────────────────────────────────────────────
 
   const userId = await ctx.db.insert("users", {
     isTourist: true,
@@ -260,42 +343,42 @@ async function runInsertLogic(ctx: any) {
 
   await ctx.db.insert("transactions", {
     userId,
-    partnerId: allmendbahnId,
-    tokensEarnedOrSpent: 500,
+    partnerId: jungfrauRailId,
+    tokensEarnedOrSpent: 600,
     type: "earn",
-    amountLAKE: 500,
+    amountLAKE: 600,
+    txHash: generateTxHash(),
+    timestamp: Date.now() - 86400000 * 7,
+  });
+  await ctx.db.insert("transactions", {
+    userId,
+    partnerId: maennlichenId,
+    tokensEarnedOrSpent: -15,
+    type: "spend",
+    amountLAKE: 15,
     txHash: generateTxHash(),
     timestamp: Date.now() - 86400000 * 5,
   });
   await ctx.db.insert("transactions", {
     userId,
-    partnerId: allmendbahnId,
-    tokensEarnedOrSpent: -43,
+    partnerId: beatusId,
+    tokensEarnedOrSpent: -9,
     type: "spend",
-    amountLAKE: 43,
-    txHash: generateTxHash(),
-    timestamp: Date.now() - 86400000 * 4,
-  });
-  await ctx.db.insert("transactions", {
-    userId,
-    partnerId: murrenSportsId,
-    tokensEarnedOrSpent: -90,
-    type: "spend",
-    amountLAKE: 90,
+    amountLAKE: 9,
     txHash: generateTxHash(),
     timestamp: Date.now() - 86400000 * 3,
   });
   await ctx.db.insert("transactions", {
     userId,
-    partnerId: jungfrauTourismId,
-    tokensEarnedOrSpent: 1523,
+    partnerId: aareschluchtId,
+    tokensEarnedOrSpent: 1314,
     type: "earn",
-    amountLAKE: 1523,
+    amountLAKE: 1314,
     txHash: generateTxHash(),
-    timestamp: Date.now() - 86400000 * 2,
+    timestamp: Date.now() - 86400000 * 1,
   });
 
-  return { message: "Seeded: 1 user, 5 partners, 12 offers, 4 transactions" };
+  return { message: "Seeded: 1 user (Alex, 1890 GT), 10 real Jungfrau partners, 12 real offers, 4 transactions" };
 }
 
 export const populateData = mutation({

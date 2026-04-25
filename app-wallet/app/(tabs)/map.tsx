@@ -37,6 +37,8 @@ function getCatColor(category?: string): string {
     ski:        '#4A90D9',
     Restaurant: '#E07B54',
     restaurant: '#E07B54',
+    Activity:   '#8B5CF6',
+    activity:   '#8B5CF6',
     'Activité': '#8B5CF6',
     activité:   '#8B5CF6',
     panorama:   '#8B5CF6',
@@ -53,6 +55,8 @@ function getCatEmoji(category?: string): string {
     ski:        '⛷️',
     Restaurant: '🍽️',
     restaurant: '🍽️',
+    Activity:   '🏔️',
+    activity:   '🏔️',
     'Activité': '🏔️',
     activité:   '🏔️',
     panorama:   '🏔️',
@@ -66,7 +70,7 @@ const CATEGORIES = [
   { id: 'Transport',  label: 'Transport',  emoji: '🚡' },
   { id: 'Ski',        label: 'Ski',        emoji: '⛷️' },
   { id: 'Restaurant', label: 'Restaurant', emoji: '🍽️' },
-  { id: 'Activité',   label: 'Activité',   emoji: '🏔️' },
+  { id: 'Activity',   label: 'Activity',   emoji: '🏔️' },
 ]
 
 const DEFAULT_CENTER: [number, number] = [7.8632, 46.6863]
