@@ -41,14 +41,14 @@ export const bookActivity = mutation({
     if (!activity) throw new Error(`Activity not found: ${activityId}`);
     if (!activity.isActive) throw new Error("Activity is not active");
 
-    if (user.jfBalance < activity.priceJF) {
+    if (user.greenTokensBalance < activity.priceJF) {
       throw new Error(
-        `Solde JF insuffisant : ${user.jfBalance} JF disponibles, ${activity.priceJF} JF requis`
+        `Solde JF insuffisant : ${user.greenTokensBalance} JF disponibles, ${activity.priceJF} JF requis`
       );
     }
 
     await ctx.db.patch(userId, {
-      jfBalance: user.jfBalance - activity.priceJF,
+      greenTokensBalance: user.greenTokensBalance - activity.priceJF,
     });
 
     const ticketSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();

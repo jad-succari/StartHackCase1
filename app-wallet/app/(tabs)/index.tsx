@@ -1,5 +1,6 @@
 import { Alert } from 'react-native'
 import { useMutation, useQuery } from 'convex/react'
+import { router } from 'expo-router'
 import { api } from '../../convex/_generated/api'
 import {
   Button,
@@ -119,6 +120,11 @@ export default function WalletScreen() {
           </YStack>
         </Card>
 
+        {/* ── Acheter des tokens ── */}
+        <GreenButton onPress={() => router.push('/buy-tokens')}>
+          💳 Acheter des Green Tokens
+        </GreenButton>
+
         {/* ── Bouton QR Code ── */}
         <GreenButton
           onPress={() =>
@@ -162,7 +168,12 @@ export default function WalletScreen() {
                     <Paragraph color="$gray10" fontSize="$3">
                       {offer.description}
                     </Paragraph>
-                    {offer.discountPercentage > 0 && offer.discountPercentage < 100 && (
+                    {offer.originalPriceCHF != null && (
+                      <Text fontSize="$2" color="$gray9" fontWeight="500">
+                        Prix original : {offer.originalPriceCHF} CHF
+                      </Text>
+                    )}
+                    {offer.discountPercentage != null && offer.discountPercentage > 0 && offer.discountPercentage < 100 && (
                       <Text fontSize="$2" color={GREEN_ACCENT} fontWeight="600">
                         −{offer.discountPercentage}% de réduction
                       </Text>
@@ -189,6 +200,24 @@ export default function WalletScreen() {
                     </Text>
                   </YStack>
                 </XStack>
+
+                {/* Bouton Réserver */}
+                <YStack paddingHorizontal="$4" paddingBottom="$4">
+                  <Button
+                    backgroundColor={GREEN_MID}
+                    borderRadius="$4"
+                    onPress={() =>
+                      router.push({
+                        pathname: '/book-offer',
+                        params: { offerId: offer._id },
+                      })
+                    }
+                  >
+                    <Text color="white" fontWeight="bold" fontSize="$4">
+                      Réserver
+                    </Text>
+                  </Button>
+                </YStack>
               </Card>
             ))
           )}
