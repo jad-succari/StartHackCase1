@@ -34,11 +34,18 @@ export default defineSchema({
     name: v.string(),
     type: v.string(),
     category: v.optional(v.string()),
-    location: v.string(),
+    location: v.optional(v.string()),
     locationName: v.optional(v.string()),
     lat: v.optional(v.number()),
     lng: v.optional(v.number()),
     isEco: v.optional(v.boolean()),
+    // Legacy fields from old documents
+    description: v.optional(v.string()),
+    village: v.optional(v.string()),
+    isActive: v.optional(v.boolean()),
+    isEcoCertified: v.optional(v.boolean()),
+    latitude: v.optional(v.number()),
+    longitude: v.optional(v.number()),
   }),
 
   offers: defineTable({
@@ -46,7 +53,7 @@ export default defineSchema({
     title: v.string(),
     description: v.string(),
     tokenCost: v.number(),
-    discountPercentage: v.number(),
+    discountPercentage: v.optional(v.number()),
     category: v.optional(v.string()),
     partnerName: v.optional(v.string()),
     locationName: v.optional(v.string()),
