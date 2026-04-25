@@ -59,6 +59,14 @@ export default function TabsLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="badges"
+        options={{
+          title: 'Badges',
+          tabBarLabel: '🏅 Badges',
+          href: isPartner ? null : undefined,
+        }}
+      />
       {/* map hidden for everyone */}
       <Tabs.Screen
         name="map"
