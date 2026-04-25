@@ -76,7 +76,7 @@ export default defineSchema({
 
   transactions: defineTable({
     userId: v.id("users"),
-    partnerId: v.id("partners"),
+    partnerId: v.optional(v.id("partners")),
     offerId: v.optional(v.id("offers")),
     timestamp: v.number(),
     tokensEarnedOrSpent: v.number(),
@@ -88,5 +88,12 @@ export default defineSchema({
     externalTicketId: v.string(),
     status: v.string(),
     purchasedAt: v.number(),
+    validDate: v.optional(v.string()), // "YYYY-MM-DD"
   }).index("by_userId", ["userId"]),
+
+  payouts: defineTable({
+    partnerId: v.id("partners"),
+    amountTokens: v.number(),
+    settledAt: v.number(),
+  }).index("by_partnerId", ["partnerId"]),
 });

@@ -1,29 +1,22 @@
 import { useState } from 'react'
-import { Alert } from 'react-native'
+import { Alert, TouchableOpacity, View } from 'react-native'
 import { router } from 'expo-router'
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '../convex/_generated/api'
-import {
-  Button,
-  Card,
-  H2,
-  Paragraph,
-  ScrollView,
-  Spinner,
-  Text,
-  XStack,
-  YStack,
-} from 'tamagui'
+import { ScrollView, Spinner, Text, XStack, YStack } from 'tamagui'
 
-const GREEN_DARK = '#1B5E20'
-const GREEN_MID = '#2E7D32'
-const GREEN_LIGHT = '#E8F5E9'
-const GREEN_ACCENT = '#4CAF50'
+const INK       = '#1A1612'
+const INK_MID   = '#6B5E52'
+const INK_LIGHT = '#A89E92'
+const BG        = '#FAF8F5'
+const TEAL      = '#2A8FA0'
+const GOLD      = '#C9A84C'
+const BORDER    = 'rgba(26,22,18,0.08)'
 
 const PACKAGES = [
-  { tokens: 100, priceCHF: 9.9, label: 'Starter' },
-  { tokens: 300, priceCHF: 24.9, label: 'Explorer', popular: true },
-  { tokens: 500, priceCHF: 39.9, label: 'Adventure' },
+  { tokens: 100,  priceCHF: 9.90,  label: 'Starter' },
+  { tokens: 300,  priceCHF: 24.90, label: 'Explorer', popular: true },
+  { tokens: 500,  priceCHF: 39.90, label: 'Adventure' },
 ]
 
 type Step = 'select' | 'payment' | 'loading' | 'success'
@@ -39,7 +32,7 @@ export default function BuyTokensScreen() {
   const handlePay = async () => {
     if (!user || !pkg) return
     setStep('loading')
-    await new Promise((r) => setTimeout(r, 2000))
+    await new Promise((r) => setTimeout(r, 1800))
     try {
       await addTokens({ userId: user._id, amount: pkg.tokens })
       setStep('success')
@@ -51,207 +44,252 @@ export default function BuyTokensScreen() {
 
   if (user === undefined) {
     return (
-      <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Spinner size="large" color={GREEN_MID} />
+      <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} backgroundColor={BG}>
+        <Spinner size="large" color={TEAL} />
       </YStack>
     )
   }
 
   return (
-    <YStack style={{ flex: 1, backgroundColor: 'white' }}>
-      {/* Header */}
-      <YStack backgroundColor={GREEN_DARK} padding="$5" paddingTop="$10" gap="$1">
+    <YStack style={{ flex: 1, backgroundColor: BG }}>
+
+      {/* ── Header ── */}
+      <YStack
+        backgroundColor="#111111"
+        paddingHorizontal="$5"
+        paddingTop="$12"
+        paddingBottom="$5"
+        gap="$1"
+      >
         {step !== 'success' && (
-          <Button
-            size="$3"
-            chromeless
-            onPress={() => router.back()}
-            alignSelf="flex-start"
-            marginBottom="$1"
-          >
-            <Text color="rgba(255,255,255,0.85)" fontSize="$4">← Back</Text>
-          </Button>
+          <TouchableOpacity onPress={() => router.back()} style={{ marginBottom: 8, alignSelf: 'flex-start' }}>
+            <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', letterSpacing: 0.3 }}>← Back</Text>
+          </TouchableOpacity>
         )}
-        <H2 color="white">Buy Tokens</H2>
-        <Text color="rgba(255,255,255,0.65)" fontSize="$3">
-          Current balance: {user?.greenTokensBalance ?? 0} GT
+        <Text style={{ fontFamily: 'Georgia', fontSize: 28, fontWeight: '400', color: GOLD, letterSpacing: -0.5 }}>
+          Buy Tokens
+        </Text>
+        <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>
+          Balance: {user?.greenTokensBalance ?? 0} GT
         </Text>
       </YStack>
 
-      {/* Step 1: Package selection */}
+      {/* ── Step 1: Package selection ── */}
       {step === 'select' && (
         <ScrollView>
-          <YStack padding="$4" gap="$3">
-            <Text color="$gray10" fontSize="$3" marginBottom="$1">
-              Choose a package:
+          <YStack padding="$4" gap="$3" paddingBottom="$8">
+            <Text style={{ fontSize: 11, fontWeight: '600', color: INK_LIGHT, letterSpacing: 1.5, textTransform: 'uppercase' }}>
+              Choose a package
             </Text>
 
-            {PACKAGES.map((p, i) => (
-              <Card
-                key={i}
-                pressStyle={{ scale: 0.98 }}
-                onPress={() => setSelectedIndex(i)}
-                borderWidth={2}
-                borderColor={selectedIndex === i ? GREEN_MID : '$color4'}
-                borderRadius="$5"
-                backgroundColor={selectedIndex === i ? GREEN_LIGHT : 'white'}
-                elevation={selectedIndex === i ? 2 : 0}
-              >
-                <XStack padding="$4" style={{ alignItems: 'center' }} gap="$4">
-                  <YStack flex={1} gap="$2">
-                    <XStack style={{ alignItems: 'center' }} gap="$2">
-                      <Text fontWeight="900" fontSize="$7" color={GREEN_DARK}>
-                        {p.tokens} GT
-                      </Text>
-                      {p.popular && (
-                        <Text
-                          fontSize="$1"
-                          fontWeight="700"
-                          color="white"
-                          backgroundColor={GREEN_ACCENT}
-                          paddingHorizontal="$2"
-                          paddingVertical="$1"
-                          borderRadius="$2"
-                        >
-                          POPULAR
+            {PACKAGES.map((p, i) => {
+              const selected = selectedIndex === i
+              return (
+                <TouchableOpacity
+                  key={i}
+                  onPress={() => setSelectedIndex(i)}
+                  style={{
+                    backgroundColor: selected ? '#111111' : 'white',
+                    borderRadius: 16,
+                    borderWidth: selected ? 1 : 1,
+                    borderColor: selected ? GOLD : BORDER,
+                    overflow: 'hidden',
+                    shadowColor: '#000',
+                    shadowOpacity: selected ? 0.18 : 0.04,
+                    shadowRadius: selected ? 16 : 6,
+                    shadowOffset: { width: 0, height: selected ? 6 : 2 },
+                  }}
+                >
+                  <XStack padding="$4" style={{ alignItems: 'center' }} gap="$4">
+                    <YStack flex={1} gap="$1">
+                      <XStack style={{ alignItems: 'center' }} gap="$2">
+                        <Text style={{
+                          fontFamily: 'Georgia',
+                          fontSize: 32, fontWeight: '500',
+                          color: selected ? GOLD : INK,
+                          lineHeight: 36,
+                        }}>
+                          {p.tokens}
+                          <Text style={{ fontFamily: 'Georgia', fontSize: 16, color: selected ? 'rgba(201,168,76,0.5)' : INK_LIGHT }}> GT</Text>
                         </Text>
-                      )}
-                    </XStack>
-                    <Text color="$gray10" fontSize="$3">{p.label}</Text>
-                  </YStack>
-                  <YStack style={{ alignItems: 'flex-end' }} gap="$1">
-                    <Text fontWeight="700" fontSize="$5" color={GREEN_DARK}>
-                      {p.priceCHF.toFixed(2)} CHF
-                    </Text>
-                    <Text fontSize="$2" color="$gray9">
-                      {((p.priceCHF / p.tokens) * 100).toFixed(1)} ct/GT
-                    </Text>
-                  </YStack>
-                </XStack>
-              </Card>
-            ))}
+                        {p.popular && (
+                          <View style={{
+                            backgroundColor: selected ? GOLD : TEAL,
+                            borderRadius: 6,
+                            paddingHorizontal: 8,
+                            paddingVertical: 3,
+                          }}>
+                            <Text style={{ fontSize: 9, fontWeight: '700', color: 'white', letterSpacing: 1 }}>
+                              POPULAR
+                            </Text>
+                          </View>
+                        )}
+                      </XStack>
+                      <Text style={{ fontSize: 12, color: selected ? 'rgba(201,168,76,0.5)' : INK_LIGHT }}>
+                        {p.label} pack
+                      </Text>
+                    </YStack>
 
-            <Button
-              size="$5"
-              backgroundColor={selectedIndex !== null ? GREEN_MID : '$gray5'}
-              borderRadius="$4"
-              marginTop="$2"
-              disabled={selectedIndex === null}
-              onPress={() => setStep('payment')}
+                    <YStack style={{ alignItems: 'flex-end' }} gap="$1">
+                      <Text style={{ fontSize: 22, fontWeight: '700', color: selected ? GOLD : INK }}>
+                        {p.priceCHF.toFixed(2)}
+                        <Text style={{ fontSize: 14, fontWeight: '400', color: selected ? 'rgba(201,168,76,0.6)' : INK_LIGHT }}> CHF</Text>
+                      </Text>
+                      <Text style={{ fontSize: 11, color: selected ? 'rgba(201,168,76,0.4)' : INK_LIGHT }}>
+                        {((p.priceCHF / p.tokens) * 100).toFixed(1)} ct/GT
+                      </Text>
+                    </YStack>
+                  </XStack>
+                </TouchableOpacity>
+              )
+            })}
+
+            <TouchableOpacity
+              onPress={() => selectedIndex !== null && setStep('payment')}
+              style={{
+                marginTop: 8,
+                backgroundColor: selectedIndex !== null ? TEAL : 'rgba(26,22,18,0.08)',
+                borderRadius: 14,
+                paddingVertical: 16,
+                alignItems: 'center',
+              }}
             >
-              <Text
-                color={selectedIndex !== null ? 'white' : '$gray9'}
-                fontWeight="bold"
-                fontSize="$4"
-              >
+              <Text style={{ fontSize: 15, fontWeight: '600', color: selectedIndex !== null ? 'white' : INK_LIGHT }}>
                 Continue →
               </Text>
-            </Button>
+            </TouchableOpacity>
           </YStack>
         </ScrollView>
       )}
 
-      {/* Step 2: Payment confirmation */}
+      {/* ── Step 2: Payment ── */}
       {step === 'payment' && pkg && (
         <ScrollView>
-          <YStack padding="$4" gap="$4">
-            <Card borderRadius="$5" borderWidth={1} borderColor="$color4" padding="$4">
-              <YStack gap="$2">
-                <Text fontWeight="700" fontSize="$4">Summary</Text>
-                <XStack justifyContent="space-between" style={{ alignItems: 'center' }}>
-                  <Text color="$gray10">{pkg.tokens} Green Tokens ({pkg.label})</Text>
-                  <Text fontWeight="800" fontSize="$5" color={GREEN_DARK}>
-                    {pkg.priceCHF.toFixed(2)} CHF
-                  </Text>
-                </XStack>
-              </YStack>
-            </Card>
+          <YStack padding="$4" gap="$4" paddingBottom="$8">
 
-            <Card borderRadius="$5" overflow="hidden" elevation={3}>
-              <YStack backgroundColor={GREEN_DARK} padding="$5" gap="$4">
-                <XStack justifyContent="space-between" style={{ alignItems: 'center' }}>
-                  <Text color="rgba(255,255,255,0.6)" fontSize="$2" fontWeight="600">
-                    PAYMENT CARD
-                  </Text>
-                  <Text color="white" fontSize="$5">💳</Text>
-                </XStack>
-                <Text color="white" fontWeight="700" fontSize="$6" letterSpacing={3}>
-                  •••• •••• •••• 4242
-                </Text>
-                <XStack justifyContent="space-between">
-                  <YStack gap="$1">
-                    <Text color="rgba(255,255,255,0.5)" fontSize="$1">CARDHOLDER</Text>
-                    <Text color="white" fontWeight="600" fontSize="$3">JOHN TOURIST</Text>
-                  </YStack>
-                  <YStack gap="$1" style={{ alignItems: 'flex-end' }}>
-                    <Text color="rgba(255,255,255,0.5)" fontSize="$1">EXPIRES</Text>
-                    <Text color="white" fontWeight="600" fontSize="$3">12/26</Text>
-                  </YStack>
-                </XStack>
-              </YStack>
-              <XStack
-                backgroundColor={GREEN_LIGHT}
-                padding="$3"
-                justifyContent="center"
-                gap="$2"
-                style={{ alignItems: 'center' }}
-              >
-                <Text fontSize="$2" color={GREEN_MID}>🔒 Secure payment — Simulation only</Text>
-              </XStack>
-            </Card>
-
-            <Button
-              size="$5"
-              backgroundColor={GREEN_MID}
+            {/* Summary row */}
+            <XStack
+              backgroundColor="white"
               borderRadius="$4"
-              onPress={() => void handlePay()}
+              borderWidth={1}
+              borderColor={BORDER}
+              padding="$4"
+              justifyContent="space-between"
+              style={{ alignItems: 'center' }}
             >
-              <Text color="white" fontWeight="bold" fontSize="$4">
+              <YStack gap="$1">
+                <Text style={{ fontSize: 11, fontWeight: '600', color: INK_LIGHT, letterSpacing: 1, textTransform: 'uppercase' }}>
+                  Summary
+                </Text>
+                <Text style={{ fontSize: 14, color: INK_MID }}>
+                  {pkg.tokens} GT · {pkg.label}
+                </Text>
+              </YStack>
+              <Text style={{ fontFamily: 'Georgia', fontSize: 26, fontWeight: '500', color: INK }}>
+                {pkg.priceCHF.toFixed(2)}
+                <Text style={{ fontFamily: 'Georgia', fontSize: 14, color: INK_LIGHT }}> CHF</Text>
+              </Text>
+            </XStack>
+
+            {/* Mock payment card — same style as wallet black card */}
+            <YStack
+              backgroundColor="#111111"
+              borderRadius="$6"
+              padding="$5"
+              gap="$4"
+              style={{
+                borderWidth: 1,
+                borderColor: 'rgba(255,255,255,0.1)',
+                shadowColor: '#000',
+                shadowOpacity: 0.3,
+                shadowRadius: 20,
+                shadowOffset: { width: 0, height: 8 },
+              }}
+            >
+              <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, backgroundColor: 'rgba(255,255,255,0.1)' }} />
+
+              <XStack justifyContent="space-between" style={{ alignItems: 'center' }}>
+                <Text style={{ fontSize: 10, fontWeight: '600', color: 'rgba(255,255,255,0.35)', letterSpacing: 1.5, textTransform: 'uppercase' }}>
+                  Payment card
+                </Text>
+                <Text style={{ fontSize: 18 }}>💳</Text>
+              </XStack>
+
+              <Text style={{ fontSize: 20, fontWeight: '600', color: 'white', letterSpacing: 4 }}>
+                •••• •••• •••• 4242
+              </Text>
+
+              <XStack justifyContent="space-between">
+                <YStack gap="$1">
+                  <Text style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', letterSpacing: 1 }}>CARDHOLDER</Text>
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: 'rgba(255,255,255,0.8)' }}>JOHN TOURIST</Text>
+                </YStack>
+                <YStack gap="$1" style={{ alignItems: 'flex-end' }}>
+                  <Text style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', letterSpacing: 1 }}>EXPIRES</Text>
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: 'rgba(255,255,255,0.8)' }}>12/26</Text>
+                </YStack>
+              </XStack>
+            </YStack>
+
+            <Text style={{ fontSize: 11, color: INK_LIGHT, textAlign: 'center' }}>
+              🔒 Secure simulation — no real payment
+            </Text>
+
+            <TouchableOpacity
+              onPress={() => void handlePay()}
+              style={{
+                backgroundColor: INK,
+                borderRadius: 14,
+                paddingVertical: 16,
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ fontSize: 15, fontWeight: '600', color: 'white' }}>
                 Pay {pkg.priceCHF.toFixed(2)} CHF
               </Text>
-            </Button>
+            </TouchableOpacity>
 
-            <Button size="$4" chromeless borderRadius="$4" onPress={() => setStep('select')}>
-              <Text color="$gray10">← Change package</Text>
-            </Button>
+            <TouchableOpacity onPress={() => setStep('select')} style={{ alignItems: 'center', paddingVertical: 8 }}>
+              <Text style={{ fontSize: 13, color: INK_LIGHT }}>← Change package</Text>
+            </TouchableOpacity>
           </YStack>
         </ScrollView>
       )}
 
-      {/* Step 3: Processing */}
+      {/* ── Step 3: Processing ── */}
       {step === 'loading' && (
         <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} gap="$4">
-          <Spinner size="large" color={GREEN_MID} />
-          <Text color="$gray10" fontSize="$4">Processing payment...</Text>
-          <Text color="$gray8" fontSize="$2">Please wait</Text>
+          <Spinner size="large" color={TEAL} />
+          <Text style={{ fontSize: 16, color: INK }}>Processing payment...</Text>
+          <Text style={{ fontSize: 13, color: INK_LIGHT }}>Please wait</Text>
         </YStack>
       )}
 
-      {/* Step 4: Success */}
+      {/* ── Step 4: Success ── */}
       {step === 'success' && pkg && (
-        <YStack
-          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-          padding="$6"
-          gap="$5"
-        >
-          <Text style={{ fontSize: 80 }}>✅</Text>
+        <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} padding="$6" gap="$5">
+          <Text style={{ fontSize: 72 }}>✅</Text>
           <YStack gap="$2" style={{ alignItems: 'center' }}>
-            <H2 style={{ textAlign: 'center' }}>Payment successful!</H2>
-            <Paragraph style={{ textAlign: 'center' }} color="$gray10" fontSize="$4">
-              {pkg.tokens} Green Tokens have been added to your account.
-            </Paragraph>
-          </YStack>
-          <Button
-            size="$5"
-            backgroundColor={GREEN_MID}
-            borderRadius="$4"
-            width="100%"
-            onPress={() => router.back()}
-          >
-            <Text color="white" fontWeight="bold" fontSize="$4">
-              Back to home
+            <Text style={{ fontFamily: 'Georgia', fontSize: 28, fontWeight: '400', color: INK, textAlign: 'center', letterSpacing: -0.5 }}>
+              Payment successful
             </Text>
-          </Button>
+            <Text style={{ fontSize: 15, color: INK_LIGHT, textAlign: 'center', lineHeight: 22 }}>
+              {pkg.tokens} Green Tokens have been added to your wallet.
+            </Text>
+          </YStack>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={{
+              backgroundColor: INK,
+              borderRadius: 14,
+              paddingVertical: 16,
+              paddingHorizontal: 32,
+              width: '100%',
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ fontSize: 15, fontWeight: '600', color: 'white' }}>Back to wallet</Text>
+          </TouchableOpacity>
         </YStack>
       )}
     </YStack>

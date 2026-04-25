@@ -72,8 +72,9 @@ export const bookOffer = mutation({
   args: {
     userId: v.id("users"),
     offerId: v.id("offers"),
+    validDate: v.optional(v.string()), // "YYYY-MM-DD"
   },
-  handler: async (ctx, { userId, offerId }) => {
+  handler: async (ctx, { userId, offerId, validDate }) => {
     const [user, offer] = await Promise.all([
       ctx.db.get(userId),
       ctx.db.get(offerId),
@@ -108,6 +109,7 @@ export const bookOffer = mutation({
       externalTicketId,
       status: "valide",
       purchasedAt: Date.now(),
+      validDate,
     });
   },
 });
@@ -126,6 +128,8 @@ export const getUserTickets = query({
         return {
           ...ticket,
           offerTitle: offer?.title ?? "Unknown offer",
+          tokenCost: offer?.tokenCost ?? 0,
+          imageUrl: offer?.imageUrl ?? null,
         };
       })
     );
@@ -142,8 +146,16 @@ export const validateTicket = mutation({
       return { success: false, message: "Invalid or already used ticket" };
     }
 
+    if (ticket.validDate) {
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+      if (ticket.validDate !== today) {
+        return { success: false, message: `Ticket is only valid on ${ticket.validDate}` };
+      }
+    }
+
     await ctx.db.patch(ticket._id, { status: "utilisé" });
-    return { success: true, message: "Ticket validated successfully!" };
+    return { success: true, message: "Ticket validated!" };
   },
 });
 
@@ -179,8 +191,102 @@ export const addTokens = mutation({
     await ctx.db.patch(userId, {
       greenTokensBalance: user.greenTokensBalance + amount,
     });
+    await ctx.db.insert("transactions", {
+      userId,
+      timestamp: Date.now(),
+      tokensEarnedOrSpent: amount,
+    });
   },
 });
+
+export const getAdminStats = query({
+  args: {},
+  handler: async (ctx) => {
+    const [users, partners, transactions, payouts] = await Promise.all([
+      ctx.db.query("users").collect(),
+      ctx.db.query("partners").collect(),
+      ctx.db.query("transactions").collect(),
+      ctx.db.query("payouts").collect(),
+    ]);
+
+    const totalTokensInCirculation = users.reduce(
+      (sum, u) => sum + u.greenTokensBalance,
+      0
+    );
+
+    const partnersWithBalance = partners.map((partner) => {
+      const earned = transactions
+        .filter((t) => t.partnerId === partner._id && t.tokensEarnedOrSpent < 0)
+        .reduce((sum, t) => sum + Math.abs(t.tokensEarnedOrSpent), 0);
+
+      const paidOut = payouts
+        .filter((p) => p.partnerId === partner._id)
+        .reduce((sum, p) => sum + p.amountTokens, 0);
+
+      const pendingTokens = Math.max(0, earned - paidOut);
+
+      return {
+        _id: partner._id,
+        name: partner.name,
+        type: partner.type,
+        pendingTokens,
+      };
+    });
+
+    return { totalTokensInCirculation, partners: partnersWithBalance };
+  },
+});
+
+export const settlePartnerAccount = mutation({
+  args: { partnerId: v.id("partners") },
+  handler: async (ctx, { partnerId }) => {
+    const [transactions, payouts] = await Promise.all([
+      ctx.db.query("transactions").collect(),
+      ctx.db
+        .query("payouts")
+        .withIndex("by_partnerId", (q) => q.eq("partnerId", partnerId))
+        .collect(),
+    ]);
+
+    const earned = transactions
+      .filter((t) => t.partnerId === partnerId && t.tokensEarnedOrSpent < 0)
+      .reduce((sum, t) => sum + Math.abs(t.tokensEarnedOrSpent), 0);
+
+    const paidOut = payouts.reduce((sum, p) => sum + p.amountTokens, 0);
+    const pending = earned - paidOut;
+
+    if (pending <= 0) return;
+
+    await ctx.db.insert("payouts", {
+      partnerId,
+      amountTokens: pending,
+      settledAt: Date.now(),
+    });
+  },
+});
+
+export const getUserTransactions = query({
+  args: { userId: v.id("users") },
+  handler: async (ctx, { userId }) => {
+    const txs = await ctx.db
+      .query("transactions")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .order("desc")
+      .collect()
+
+    return await Promise.all(
+      txs.map(async (tx) => {
+        const offer = tx.offerId ? await ctx.db.get(tx.offerId) : null
+        return {
+          _id: tx._id,
+          timestamp: tx.timestamp,
+          tokensEarnedOrSpent: tx.tokensEarnedOrSpent,
+          label: offer?.title ?? (tx.tokensEarnedOrSpent > 0 ? 'Token purchase' : 'Tokens spent'),
+        }
+      })
+    )
+  },
+})
 
 export const earnTokens = mutation({
   args: {
