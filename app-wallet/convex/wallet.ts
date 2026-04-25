@@ -132,19 +132,34 @@ export const getUserTickets = query({
   },
 });
 
+export const validateTicket = mutation({
+  args: { externalTicketId: v.string() },
+  handler: async (ctx, { externalTicketId }) => {
+    const tickets = await ctx.db.query("tickets").collect();
+    const ticket = tickets.find((t) => t.externalTicketId === externalTicketId);
+
+    if (!ticket || ticket.status !== "valide") {
+      return { success: false, message: "Invalid or already used ticket" };
+    }
+
+    await ctx.db.patch(ticket._id, { status: "utilisé" });
+    return { success: true, message: "Ticket validated successfully!" };
+  },
+});
+
 export const cancelTicket = mutation({
   args: { ticketId: v.id("tickets") },
   handler: async (ctx, { ticketId }) => {
     const ticket = await ctx.db.get(ticketId);
-    if (!ticket) throw new Error("Billet introuvable");
-    if (ticket.status !== "valide") throw new Error("Ce billet ne peut pas être annulé");
+    if (!ticket) throw new Error("Ticket not found");
+    if (ticket.status !== "valide") throw new Error("This ticket cannot be cancelled");
 
     const [user, offer] = await Promise.all([
       ctx.db.get(ticket.userId),
       ctx.db.get(ticket.offerId),
     ]);
 
-    if (!user) throw new Error("Utilisateur introuvable");
+    if (!user) throw new Error("User not found");
 
     if (offer) {
       await ctx.db.patch(ticket.userId, {

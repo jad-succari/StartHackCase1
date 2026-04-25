@@ -38,13 +38,8 @@ export default function BookOfferScreen() {
     try {
       await bookOffer({ userId: user._id, offerId: offer._id })
       setStep('success')
-    } catch (err) {
-      const msg = (err as Error).message
-      if (msg.includes('Insufficient') || msg.includes('insuffisant')) {
-        setStep('error')
-      } else {
-        setStep('error')
-      }
+    } catch {
+      setStep('error')
     }
   }
 
@@ -72,16 +67,16 @@ export default function BookOfferScreen() {
             alignSelf="flex-start"
             marginBottom="$1"
           >
-            <Text color="rgba(255,255,255,0.85)" fontSize="$4">← Retour</Text>
+            <Text color="rgba(255,255,255,0.85)" fontSize="$4">← Back</Text>
           </Button>
         )}
-        <H2 color="white">Réserver une offre</H2>
+        <H2 color="white">Book an offer</H2>
         <Text color="rgba(255,255,255,0.65)" fontSize="$3">
-          Solde : {balance} GT disponibles
+          Balance: {balance} GT available
         </Text>
       </YStack>
 
-      {/* Étape 1 : Confirmation */}
+      {/* Step 1: Confirmation */}
       {step === 'confirm' && offer && (
         <YStack padding="$4" gap="$4">
           <Card borderRadius="$5" borderWidth={1} borderColor="$color4" overflow="hidden">
@@ -98,7 +93,7 @@ export default function BookOfferScreen() {
               style={{ alignItems: 'center' }}
             >
               <Text color={GREEN_DARK} fontWeight="600" fontSize="$3">
-                Coût de la réservation
+                Booking cost
               </Text>
               <XStack style={{ alignItems: 'baseline' }} gap="$1">
                 <Text fontWeight="900" fontSize="$7" color={GREEN_DARK}>
@@ -117,10 +112,10 @@ export default function BookOfferScreen() {
               gap="$1"
             >
               <Text color={RED} fontWeight="700" fontSize="$3">
-                ⚠️ Solde insuffisant
+                ⚠️ Insufficient balance
               </Text>
               <Text color={RED} fontSize="$2">
-                Il vous manque {cost - balance} GT pour cette offre.
+                You are {cost - balance} GT short for this offer.
               </Text>
             </YStack>
           )}
@@ -137,7 +132,7 @@ export default function BookOfferScreen() {
               fontWeight="bold"
               fontSize="$4"
             >
-              {canAfford ? 'Confirmer la réservation' : 'Solde insuffisant'}
+              {canAfford ? 'Confirm booking' : 'Insufficient balance'}
             </Text>
           </Button>
 
@@ -150,25 +145,25 @@ export default function BookOfferScreen() {
               backgroundColor="white"
               onPress={() => router.push('/buy-tokens')}
             >
-              <Text color={GREEN_MID} fontWeight="600">💳 Acheter des tokens</Text>
+              <Text color={GREEN_MID} fontWeight="600">💳 Buy tokens</Text>
             </Button>
           )}
         </YStack>
       )}
 
-      {/* Étape 2 : Traitement */}
+      {/* Step 2: Processing */}
       {step === 'processing' && (
         <YStack
           style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
           gap="$4"
         >
           <Spinner size="large" color={GREEN_MID} />
-          <Text color="$gray10" fontSize="$4">Réservation en cours...</Text>
-          <Text color="$gray8" fontSize="$2">Veuillez patienter</Text>
+          <Text color="$gray10" fontSize="$4">Booking in progress...</Text>
+          <Text color="$gray8" fontSize="$2">Please wait</Text>
         </YStack>
       )}
 
-      {/* Étape 3 : Succès */}
+      {/* Step 3: Success */}
       {step === 'success' && (
         <YStack
           style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
@@ -177,9 +172,9 @@ export default function BookOfferScreen() {
         >
           <Text style={{ fontSize: 80 }}>✅</Text>
           <YStack gap="$2" style={{ alignItems: 'center' }}>
-            <H2 style={{ textAlign: 'center' }}>Réservation confirmée !</H2>
+            <H2 style={{ textAlign: 'center' }}>Booking confirmed!</H2>
             <Paragraph style={{ textAlign: 'center' }} color="$gray10" fontSize="$4">
-              Votre billet est prêt. Présentez-le au contrôleur.
+              Your ticket is ready. Show it to the inspector.
             </Paragraph>
           </YStack>
           <Button
@@ -190,7 +185,7 @@ export default function BookOfferScreen() {
             onPress={() => router.push('/(tabs)/tickets')}
           >
             <Text color="white" fontWeight="bold" fontSize="$4">
-              Voir mes billets
+              View my tickets
             </Text>
           </Button>
           <Button
@@ -199,12 +194,12 @@ export default function BookOfferScreen() {
             borderRadius="$4"
             onPress={() => router.back()}
           >
-            <Text color="$gray10">← Retour aux offres</Text>
+            <Text color="$gray10">← Back to offers</Text>
           </Button>
         </YStack>
       )}
 
-      {/* Étape 4 : Erreur solde insuffisant */}
+      {/* Step 4: Insufficient balance */}
       {step === 'error' && (
         <YStack
           style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
@@ -213,9 +208,9 @@ export default function BookOfferScreen() {
         >
           <Text style={{ fontSize: 80 }}>❌</Text>
           <YStack gap="$2" style={{ alignItems: 'center' }}>
-            <H2 style={{ textAlign: 'center' }}>Solde insuffisant</H2>
+            <H2 style={{ textAlign: 'center' }}>Insufficient balance</H2>
             <Paragraph style={{ textAlign: 'center' }} color="$gray10" fontSize="$4">
-              Vous n'avez pas assez de Green Tokens pour réserver cette offre.
+              You don't have enough Green Tokens to book this offer.
             </Paragraph>
           </YStack>
           <Button
@@ -225,7 +220,7 @@ export default function BookOfferScreen() {
             width="100%"
             onPress={() => router.push('/buy-tokens')}
           >
-            <Text color="white" fontWeight="bold" fontSize="$4">💳 Acheter des tokens</Text>
+            <Text color="white" fontWeight="bold" fontSize="$4">💳 Buy tokens</Text>
           </Button>
           <Button
             size="$4"
@@ -233,7 +228,7 @@ export default function BookOfferScreen() {
             borderRadius="$4"
             onPress={() => router.back()}
           >
-            <Text color="$gray10">← Retour aux offres</Text>
+            <Text color="$gray10">← Back to offers</Text>
           </Button>
         </YStack>
       )}

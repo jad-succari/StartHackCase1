@@ -8,7 +8,6 @@ export const populateData = mutation({
       return { message: "Data already populated" };
     }
 
-    // 2 utilisateurs
     await ctx.db.insert("users", {
       name: "Alex Schmidt",
       email: "alex@test.com",
@@ -25,11 +24,10 @@ export const populateData = mutation({
       passSerialNumber: "PSN-002",
     });
 
-    // 3 partenaires réels de la région
     const jungfraubahnId = await ctx.db.insert("partners", {
       name: "Jungfraubahn",
       type: "transport",
-      description: "Le train vers le Sommet de l'Europe à 3454m d'altitude",
+      description: "The train to the Top of Europe at 3,454 m altitude",
       village: "Interlaken",
       latitude: 46.6863,
       longitude: 7.8632,
@@ -40,8 +38,7 @@ export const populateData = mutation({
     const harderKulmId = await ctx.db.insert("partners", {
       name: "Harder Kulm",
       type: "activity",
-      description:
-        "Panorama exceptionnel sur les lacs de Thoune et Brienz depuis 1322m",
+      description: "Exceptional panorama over Lake Thun and Lake Brienz from 1,322 m",
       village: "Interlaken",
       latitude: 46.7003,
       longitude: 7.8694,
@@ -52,8 +49,7 @@ export const populateData = mutation({
     const grindelwaldId = await ctx.db.insert("partners", {
       name: "Grindelwald Ski Resort",
       type: "ski",
-      description:
-        "Station de ski au pied de l'Eiger avec 213km de pistes balisées",
+      description: "Ski resort at the foot of the Eiger with 213 km of marked slopes",
       village: "Grindelwald",
       latitude: 46.6245,
       longitude: 8.0411,
@@ -61,12 +57,11 @@ export const populateData = mutation({
       isActive: true,
     });
 
-    // 5 activités avec prix JF et prix original CHF
     await ctx.db.insert("activities", {
       partnerId: jungfraubahnId,
-      title: "Montée Jungfraujoch",
+      title: "Jungfraujoch Ascent",
       description:
-        "Billet aller-retour en train à crémaillère jusqu'au Jungfraujoch à 3454m, vue panoramique sur l'Aletschgletscher",
+        "Round-trip rack railway ticket to Jungfraujoch at 3,454 m, panoramic view of the Aletsch Glacier",
       priceJF: 180,
       originalPriceCHF: 232,
       durationMinutes: 240,
@@ -75,9 +70,9 @@ export const populateData = mutation({
 
     await ctx.db.insert("activities", {
       partnerId: harderKulmId,
-      title: "Panorama Harder Kulm",
+      title: "Harder Kulm Panorama",
       description:
-        "Télécabine jusqu'à la terrasse Two Lakes Bridge à 1322m, vue à 360° sur Interlaken et les Alpes",
+        "Cable car to the Two Lakes Bridge terrace at 1,322 m, 360° view over Interlaken and the Alps",
       priceJF: 35,
       originalPriceCHF: 44,
       durationMinutes: 90,
@@ -86,9 +81,9 @@ export const populateData = mutation({
 
     await ctx.db.insert("activities", {
       partnerId: grindelwaldId,
-      title: "Journée ski Grindelwald",
+      title: "Grindelwald Ski Day",
       description:
-        "Forfait journée avec accès illimité aux remontées mécaniques Grindelwald–Wengen, 213km de pistes",
+        "Full-day pass with unlimited access to Grindelwald–Wengen lifts, 213 km of slopes",
       priceJF: 75,
       originalPriceCHF: 95,
       durationMinutes: 480,
@@ -97,9 +92,9 @@ export const populateData = mutation({
 
     await ctx.db.insert("activities", {
       partnerId: jungfraubahnId,
-      title: "Tour vallée Lauterbrunnen",
+      title: "Lauterbrunnen Valley Tour",
       description:
-        "Excursion guidée dans la vallée des 72 cascades, départ depuis Interlaken en train panoramique",
+        "Guided excursion through the valley of 72 waterfalls, departing from Interlaken by panoramic train",
       priceJF: 45,
       originalPriceCHF: 58,
       durationMinutes: 180,
@@ -108,9 +103,9 @@ export const populateData = mutation({
 
     await ctx.db.insert("activities", {
       partnerId: grindelwaldId,
-      title: "Excursion Glacier",
+      title: "Glacier Excursion",
       description:
-        "Randonnée sur le glacier de Grindelwald avec guide certifié, équipement fourni",
+        "Guided hike on the Grindelwald glacier with a certified guide, equipment provided",
       priceJF: 60,
       originalPriceCHF: 77,
       durationMinutes: 300,

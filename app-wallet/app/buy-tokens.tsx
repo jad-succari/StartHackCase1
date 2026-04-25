@@ -45,7 +45,7 @@ export default function BuyTokensScreen() {
       setStep('success')
     } catch {
       setStep('payment')
-      Alert.alert('Erreur', 'Le paiement a échoué. Veuillez réessayer.')
+      Alert.alert('Error', 'Payment failed. Please try again.')
     }
   }
 
@@ -69,21 +69,21 @@ export default function BuyTokensScreen() {
             alignSelf="flex-start"
             marginBottom="$1"
           >
-            <Text color="rgba(255,255,255,0.85)" fontSize="$4">← Retour</Text>
+            <Text color="rgba(255,255,255,0.85)" fontSize="$4">← Back</Text>
           </Button>
         )}
-        <H2 color="white">Acheter des tokens</H2>
+        <H2 color="white">Buy Tokens</H2>
         <Text color="rgba(255,255,255,0.65)" fontSize="$3">
-          Solde actuel : {user?.greenTokensBalance ?? 0} GT
+          Current balance: {user?.greenTokensBalance ?? 0} GT
         </Text>
       </YStack>
 
-      {/* Étape 1 : Sélection du pack */}
+      {/* Step 1: Package selection */}
       {step === 'select' && (
         <ScrollView>
           <YStack padding="$4" gap="$3">
             <Text color="$gray10" fontSize="$3" marginBottom="$1">
-              Choisissez un pack :
+              Choose a package:
             </Text>
 
             {PACKAGES.map((p, i) => (
@@ -113,7 +113,7 @@ export default function BuyTokensScreen() {
                           paddingVertical="$1"
                           borderRadius="$2"
                         >
-                          POPULAIRE
+                          POPULAR
                         </Text>
                       )}
                     </XStack>
@@ -144,20 +144,20 @@ export default function BuyTokensScreen() {
                 fontWeight="bold"
                 fontSize="$4"
               >
-                Continuer →
+                Continue →
               </Text>
             </Button>
           </YStack>
         </ScrollView>
       )}
 
-      {/* Étape 2 : Confirmation paiement */}
+      {/* Step 2: Payment confirmation */}
       {step === 'payment' && pkg && (
         <ScrollView>
           <YStack padding="$4" gap="$4">
             <Card borderRadius="$5" borderWidth={1} borderColor="$color4" padding="$4">
               <YStack gap="$2">
-                <Text fontWeight="700" fontSize="$4">Récapitulatif</Text>
+                <Text fontWeight="700" fontSize="$4">Summary</Text>
                 <XStack justifyContent="space-between" style={{ alignItems: 'center' }}>
                   <Text color="$gray10">{pkg.tokens} Green Tokens ({pkg.label})</Text>
                   <Text fontWeight="800" fontSize="$5" color={GREEN_DARK}>
@@ -171,7 +171,7 @@ export default function BuyTokensScreen() {
               <YStack backgroundColor={GREEN_DARK} padding="$5" gap="$4">
                 <XStack justifyContent="space-between" style={{ alignItems: 'center' }}>
                   <Text color="rgba(255,255,255,0.6)" fontSize="$2" fontWeight="600">
-                    CARTE DE PAIEMENT
+                    PAYMENT CARD
                   </Text>
                   <Text color="white" fontSize="$5">💳</Text>
                 </XStack>
@@ -180,11 +180,11 @@ export default function BuyTokensScreen() {
                 </Text>
                 <XStack justifyContent="space-between">
                   <YStack gap="$1">
-                    <Text color="rgba(255,255,255,0.5)" fontSize="$1">TITULAIRE</Text>
-                    <Text color="white" fontWeight="600" fontSize="$3">JEAN TOURISTE</Text>
+                    <Text color="rgba(255,255,255,0.5)" fontSize="$1">CARDHOLDER</Text>
+                    <Text color="white" fontWeight="600" fontSize="$3">JOHN TOURIST</Text>
                   </YStack>
                   <YStack gap="$1" style={{ alignItems: 'flex-end' }}>
-                    <Text color="rgba(255,255,255,0.5)" fontSize="$1">EXPIRE</Text>
+                    <Text color="rgba(255,255,255,0.5)" fontSize="$1">EXPIRES</Text>
                     <Text color="white" fontWeight="600" fontSize="$3">12/26</Text>
                   </YStack>
                 </XStack>
@@ -196,7 +196,7 @@ export default function BuyTokensScreen() {
                 gap="$2"
                 style={{ alignItems: 'center' }}
               >
-                <Text fontSize="$2" color={GREEN_MID}>🔒 Paiement sécurisé — Simulation uniquement</Text>
+                <Text fontSize="$2" color={GREEN_MID}>🔒 Secure payment — Simulation only</Text>
               </XStack>
             </Card>
 
@@ -207,27 +207,27 @@ export default function BuyTokensScreen() {
               onPress={() => void handlePay()}
             >
               <Text color="white" fontWeight="bold" fontSize="$4">
-                Payer {pkg.priceCHF.toFixed(2)} CHF
+                Pay {pkg.priceCHF.toFixed(2)} CHF
               </Text>
             </Button>
 
             <Button size="$4" chromeless borderRadius="$4" onPress={() => setStep('select')}>
-              <Text color="$gray10">← Changer de pack</Text>
+              <Text color="$gray10">← Change package</Text>
             </Button>
           </YStack>
         </ScrollView>
       )}
 
-      {/* Étape 3 : Traitement */}
+      {/* Step 3: Processing */}
       {step === 'loading' && (
         <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} gap="$4">
           <Spinner size="large" color={GREEN_MID} />
-          <Text color="$gray10" fontSize="$4">Traitement du paiement...</Text>
-          <Text color="$gray8" fontSize="$2">Veuillez patienter</Text>
+          <Text color="$gray10" fontSize="$4">Processing payment...</Text>
+          <Text color="$gray8" fontSize="$2">Please wait</Text>
         </YStack>
       )}
 
-      {/* Étape 4 : Succès */}
+      {/* Step 4: Success */}
       {step === 'success' && pkg && (
         <YStack
           style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
@@ -236,9 +236,9 @@ export default function BuyTokensScreen() {
         >
           <Text style={{ fontSize: 80 }}>✅</Text>
           <YStack gap="$2" style={{ alignItems: 'center' }}>
-            <H2 style={{ textAlign: 'center' }}>Paiement réussi !</H2>
+            <H2 style={{ textAlign: 'center' }}>Payment successful!</H2>
             <Paragraph style={{ textAlign: 'center' }} color="$gray10" fontSize="$4">
-              {pkg.tokens} Green Tokens ont été crédités sur votre compte.
+              {pkg.tokens} Green Tokens have been added to your account.
             </Paragraph>
           </YStack>
           <Button
@@ -249,7 +249,7 @@ export default function BuyTokensScreen() {
             onPress={() => router.back()}
           >
             <Text color="white" fontWeight="bold" fontSize="$4">
-              Retour à l'accueil
+              Back to home
             </Text>
           </Button>
         </YStack>

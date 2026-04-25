@@ -53,7 +53,7 @@ export default function WalletScreen() {
     return (
       <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} gap="$3">
         <Spinner size="large" color={GREEN_MID} />
-        <Text color="$gray10">Chargement...</Text>
+        <Text color="$gray10">Loading...</Text>
       </YStack>
     )
   }
@@ -69,12 +69,11 @@ export default function WalletScreen() {
         <YStack gap="$2" style={{ alignItems: 'center' }}>
           <H2 style={{ textAlign: 'center' }}>JungfrauWallet</H2>
           <Paragraph style={{ textAlign: 'center' }} color="$gray10">
-            Commencez par initialiser les données de démonstration pour explorer l'expérience
-            touristique durable.
+            Start by loading the demo data to explore the sustainable tourism experience.
           </Paragraph>
         </YStack>
         <GreenButton width="100%" onPress={() => void populateData({})}>
-          Initialiser les données de test
+          Load test data
         </GreenButton>
       </YStack>
     )
@@ -83,19 +82,19 @@ export default function WalletScreen() {
   return (
     <ScrollView>
       <YStack padding="$4" gap="$5" paddingBottom="$8">
-        {/* ── Header ── */}
+        {/* Header */}
         <YStack marginTop="$2" gap="$1">
           <Text color="$gray10" fontSize="$3">
-            Bienvenue,
+            Welcome,
           </Text>
           <H2>{user.name}</H2>
         </YStack>
 
-        {/* ── Carte de solde ── */}
+        {/* Balance card */}
         <Card elevation={4} borderRadius="$6" overflow="hidden">
           <YStack backgroundColor={GREEN_DARK} padding="$5" gap="$2">
             <Text color="rgba(255,255,255,0.65)" fontSize="$2">
-              SOLDE ACTUEL
+              CURRENT BALANCE
             </Text>
             <XStack style={{ alignItems: 'baseline' }} gap="$2">
               <Text color="white" fontWeight="900" style={{ fontSize: 60, lineHeight: 68 }}>
@@ -106,7 +105,7 @@ export default function WalletScreen() {
               </Text>
             </XStack>
             <Text color="rgba(255,255,255,0.65)" fontSize="$3">
-              Green Tokens disponibles
+              Green Tokens available
             </Text>
           </YStack>
           <YStack backgroundColor={GREEN_MID} padding="$3">
@@ -115,41 +114,41 @@ export default function WalletScreen() {
               fontSize="$2"
               style={{ textAlign: 'center' }}
             >
-              🌿 Programme Tourisme Durable · Région Jungfrau
+              🌿 Sustainable Tourism Programme · Jungfrau Region
             </Text>
           </YStack>
         </Card>
 
-        {/* ── Acheter des tokens ── */}
+        {/* Buy tokens */}
         <GreenButton onPress={() => router.push('/buy-tokens')}>
-          💳 Acheter des Green Tokens
+          💳 Buy Green Tokens
         </GreenButton>
 
-        {/* ── Bouton QR Code ── */}
+        {/* QR Code button */}
         <GreenButton
           onPress={() =>
             Alert.alert(
               '🎫 QR Code',
-              'Votre QR Code personnel sera généré ici.\nFonctionnalité en cours de développement.',
+              'Your personal QR Code will be generated here.\nFeature coming soon.',
               [{ text: 'OK', style: 'default' }]
             )
           }
         >
-          🎫 Générer mon QR Code
+          🎫 Generate my QR Code
         </GreenButton>
 
         <Separator />
 
-        {/* ── Liste des offres ── */}
+        {/* Offers list */}
         <YStack gap="$3">
-          <H2 fontSize="$6">Offres disponibles</H2>
+          <H2 fontSize="$6">Available Offers</H2>
 
           {offers === undefined ? (
             <YStack style={{ alignItems: 'center' }} padding="$4">
               <Spinner color={GREEN_MID} />
             </YStack>
           ) : offers.length === 0 ? (
-            <Text color="$gray10">Aucune offre disponible pour le moment.</Text>
+            <Text color="$gray10">No offers available at the moment.</Text>
           ) : (
             offers.map((offer) => (
               <Card
@@ -160,7 +159,7 @@ export default function WalletScreen() {
                 borderRadius="$5"
               >
                 <XStack padding="$4" gap="$4" style={{ alignItems: 'center' }}>
-                  {/* Infos de l'offre */}
+                  {/* Offer info */}
                   <YStack flex={1} gap="$1">
                     <Text fontWeight="700" fontSize="$4">
                       {offer.title}
@@ -170,22 +169,22 @@ export default function WalletScreen() {
                     </Paragraph>
                     {offer.originalPriceCHF != null && (
                       <Text fontSize="$2" color="$gray9" fontWeight="500">
-                        Prix original : {offer.originalPriceCHF} CHF
+                        Original price: {offer.originalPriceCHF} CHF
                       </Text>
                     )}
                     {offer.discountPercentage != null && offer.discountPercentage > 0 && offer.discountPercentage < 100 && (
                       <Text fontSize="$2" color={GREEN_ACCENT} fontWeight="600">
-                        −{offer.discountPercentage}% de réduction
+                        −{offer.discountPercentage}% discount
                       </Text>
                     )}
                     {offer.discountPercentage === 100 && (
                       <Text fontSize="$2" color={GREEN_ACCENT} fontWeight="600">
-                        Offert avec vos tokens 🎁
+                        Free with your tokens 🎁
                       </Text>
                     )}
                   </YStack>
 
-                  {/* Badge coût tokens */}
+                  {/* Token cost badge */}
                   <YStack
                     backgroundColor={GREEN_LIGHT}
                     borderRadius="$4"
@@ -201,7 +200,7 @@ export default function WalletScreen() {
                   </YStack>
                 </XStack>
 
-                {/* Bouton Réserver */}
+                {/* Book button */}
                 <YStack paddingHorizontal="$4" paddingBottom="$4">
                   <Button
                     backgroundColor={GREEN_MID}
@@ -214,7 +213,7 @@ export default function WalletScreen() {
                     }
                   >
                     <Text color="white" fontWeight="bold" fontSize="$4">
-                      Réserver
+                      Book
                     </Text>
                   </Button>
                 </YStack>

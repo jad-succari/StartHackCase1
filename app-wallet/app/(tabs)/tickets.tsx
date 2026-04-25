@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Alert, View } from 'react-native'
+import { Alert } from 'react-native'
 import { useMutation, useQuery } from 'convex/react'
+import QRCode from 'react-native-qrcode-svg'
 import { api } from '../../convex/_generated/api'
 import type { Id } from '../../convex/_generated/dataModel'
 import { Button, Card, H2, Paragraph, ScrollView, Spinner, Text, YStack } from 'tamagui'
@@ -9,6 +10,12 @@ const GREEN_DARK = '#1B5E20'
 const GREEN_MID = '#2E7D32'
 const GREEN_LIGHT = '#E8F5E9'
 const RED = '#C62828'
+
+const STATUS_LABELS: Record<string, string> = {
+  valide: 'VALID',
+  annulé: 'CANCELLED',
+  utilisé: 'USED',
+}
 
 export default function TicketsScreen() {
   const user = useQuery(api.wallet.getUser)
@@ -23,9 +30,9 @@ export default function TicketsScreen() {
     setCancellingId(ticketId)
     try {
       await cancelTicket({ ticketId })
-      Alert.alert('Réservation annulée', 'Vos tokens ont été remboursés.')
+      Alert.alert('Booking cancelled', 'Your tokens have been refunded.')
     } catch (err) {
-      Alert.alert('Erreur', (err as Error).message)
+      Alert.alert('Error', (err as Error).message)
     } finally {
       setCancellingId(null)
     }
@@ -33,12 +40,12 @@ export default function TicketsScreen() {
 
   const handleCancel = (ticketId: Id<'tickets'>, offerTitle: string) => {
     Alert.alert(
-      'Annuler la réservation',
-      `Voulez-vous annuler "${offerTitle}" ?\nVos tokens vous seront remboursés.`,
+      'Cancel booking',
+      `Do you want to cancel "${offerTitle}"?\nYour tokens will be refunded.`,
       [
-        { text: 'Non', style: 'cancel' },
+        { text: 'No', style: 'cancel' },
         {
-          text: 'Oui, annuler',
+          text: 'Yes, cancel',
           style: 'destructive',
           onPress: () => void doCancel(ticketId),
         },
@@ -50,7 +57,7 @@ export default function TicketsScreen() {
     return (
       <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} gap="$3">
         <Spinner size="large" color={GREEN_MID} />
-        <Text color="$gray10">Chargement...</Text>
+        <Text color="$gray10">Loading...</Text>
       </YStack>
     )
   }
@@ -60,7 +67,7 @@ export default function TicketsScreen() {
       <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} padding="$6" gap="$3">
         <Text style={{ fontSize: 48 }}>🎫</Text>
         <Paragraph style={{ textAlign: 'center' }} color="$gray10">
-          Vous n'avez aucune réservation en cours
+          You have no active bookings
         </Paragraph>
       </YStack>
     )
@@ -69,7 +76,7 @@ export default function TicketsScreen() {
   return (
     <ScrollView>
       <YStack padding="$4" gap="$4" paddingBottom="$8">
-        <H2>Mes Billets</H2>
+        <H2>My Tickets</H2>
 
         {tickets.map((ticket) => {
           const isValide = ticket.status === 'valide'
@@ -85,7 +92,7 @@ export default function TicketsScreen() {
               overflow="hidden"
               opacity={isValide ? 1 : 0.6}
             >
-              {/* En-tête */}
+              {/* Header */}
               <YStack
                 backgroundColor={isValide ? GREEN_DARK : '#757575'}
                 padding="$4"
@@ -95,47 +102,27 @@ export default function TicketsScreen() {
                   {ticket.offerTitle}
                 </Text>
                 <Text color="rgba(255,255,255,0.7)" fontSize="$2">
-                  ID Partenaire : {ticket.externalTicketId}
+                  Partner ID: {ticket.externalTicketId}
                 </Text>
               </YStack>
 
-              {/* QR Code simulé — uniquement si valide */}
+              {/* QR Code — valid tickets only */}
               {isValide && (
                 <YStack
                   backgroundColor={GREEN_LIGHT}
                   padding="$5"
                   style={{ alignItems: 'center' }}
                 >
-                  <View
-                    style={{
-                      width: 140,
-                      height: 140,
-                      backgroundColor: '#9E9E9E',
-                      borderRadius: 8,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: 'white',
-                        fontSize: 13,
-                        textAlign: 'center',
-                        fontWeight: '700',
-                      }}
-                    >
-                      {'█ █ █\n█   █\n█ █ █\n\nQR CODE'}
-                    </Text>
-                  </View>
+                  <QRCode value={ticket.externalTicketId} size={160} />
                 </YStack>
               )}
 
-              {/* Infos + actions */}
+              {/* Info + actions */}
               <YStack padding="$4" gap="$3">
                 <YStack gap="$1">
                   <Text fontSize="$3" color="$gray10">
-                    Date d'achat :{' '}
-                    {new Date(ticket.purchasedAt).toLocaleDateString('fr-FR', {
+                    Purchase date:{' '}
+                    {new Date(ticket.purchasedAt).toLocaleDateString('en-US', {
                       day: '2-digit',
                       month: 'long',
                       year: 'numeric',
@@ -146,7 +133,7 @@ export default function TicketsScreen() {
                     fontWeight="700"
                     color={isValide ? GREEN_MID : '$gray10'}
                   >
-                    Statut : {ticket.status.toUpperCase()}
+                    Status: {STATUS_LABELS[ticket.status] ?? ticket.status.toUpperCase()}
                   </Text>
                 </YStack>
 
@@ -164,7 +151,7 @@ export default function TicketsScreen() {
                       <Spinner size="small" color={RED} />
                     ) : (
                       <Text color={RED} fontWeight="600" fontSize="$3">
-                        Annuler la réservation
+                        Cancel booking
                       </Text>
                     )}
                   </Button>
