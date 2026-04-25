@@ -15,6 +15,7 @@ export const populateData = mutation({
       role: "tourist",
       jfBalance: 500,
       passSerialNumber: "PSN-001",
+      greenTokensBalance: 100,
     });
 
     await ctx.db.insert("users", {
@@ -23,6 +24,7 @@ export const populateData = mutation({
       role: "partner",
       jfBalance: 0,
       passSerialNumber: "PSN-002",
+      greenTokensBalance: 0,
     });
 
     // 3 partenaires réels de la région

@@ -8,6 +8,7 @@ export default defineSchema({
     role: v.union(v.literal("tourist"), v.literal("partner"), v.literal("admin")),
     jfBalance: v.number(),
     passSerialNumber: v.string(),
+    greenTokensBalance: v.number(),
   })
     .index("by_email", ["email"])
     .index("by_role", ["role"]),
@@ -63,5 +64,23 @@ export default defineSchema({
     reason: v.string(),
     relatedBookingId: v.optional(v.id("bookings")),
     createdAt: v.number(),
+  }).index("by_userId", ["userId"]),
+
+  offers: defineTable({
+    partnerId: v.id("partners"),
+    title: v.string(),
+    description: v.string(),
+    tokenCost: v.number(),
+    isActive: v.boolean(),
+  })
+    .index("by_partnerId", ["partnerId"])
+    .index("by_isActive", ["isActive"]),
+
+  transactions: defineTable({
+    userId: v.id("users"),
+    partnerId: v.id("partners"),
+    offerId: v.optional(v.id("offers")),
+    timestamp: v.number(),
+    tokensEarnedOrSpent: v.number(),
   }).index("by_userId", ["userId"]),
 });
