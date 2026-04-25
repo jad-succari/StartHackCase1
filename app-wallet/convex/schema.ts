@@ -5,25 +5,23 @@ export default defineSchema({
   users: defineTable({
     name: v.string(),
     email: v.string(),
-    role: v.union(v.literal("tourist"), v.literal("partner"), v.literal("admin")),
-    jfBalance: v.number(),
-    passSerialNumber: v.string(),
-  })
-    .index("by_email", ["email"])
-    .index("by_role", ["role"]),
+    role: v.optional(v.union(v.literal("tourist"), v.literal("partner"), v.literal("admin"))),
+    greenTokensBalance: v.number(),
+    passSerialNumber: v.optional(v.string()),
+    isTourist: v.optional(v.boolean()),
+  }).index("by_email", ["email"]),
 
   partners: defineTable({
     name: v.string(),
     type: v.string(),
-    description: v.string(),
-    village: v.string(),
-    latitude: v.number(),
-    longitude: v.number(),
-    isEcoCertified: v.boolean(),
-    isActive: v.boolean(),
-  })
-    .index("by_village", ["village"])
-    .index("by_isActive", ["isActive"]),
+    description: v.optional(v.string()),
+    village: v.optional(v.string()),
+    location: v.optional(v.string()),
+    latitude: v.optional(v.number()),
+    longitude: v.optional(v.number()),
+    isEcoCertified: v.optional(v.boolean()),
+    isActive: v.optional(v.boolean()),
+  }),
 
   activities: defineTable({
     partnerId: v.id("partners"),
@@ -63,5 +61,32 @@ export default defineSchema({
     reason: v.string(),
     relatedBookingId: v.optional(v.id("bookings")),
     createdAt: v.number(),
+  }).index("by_userId", ["userId"]),
+
+  offers: defineTable({
+    partnerId: v.id("partners"),
+    title: v.string(),
+    description: v.string(),
+    tokenCost: v.number(),
+    originalPriceCHF: v.optional(v.number()),
+    imageUrl: v.optional(v.string()),
+    isActive: v.optional(v.boolean()),
+    discountPercentage: v.optional(v.number()),
+  }).index("by_partnerId", ["partnerId"]),
+
+  transactions: defineTable({
+    userId: v.id("users"),
+    partnerId: v.id("partners"),
+    offerId: v.optional(v.id("offers")),
+    timestamp: v.number(),
+    tokensEarnedOrSpent: v.number(),
+  }).index("by_userId", ["userId"]),
+
+  tickets: defineTable({
+    userId: v.id("users"),
+    offerId: v.id("offers"),
+    externalTicketId: v.string(),
+    status: v.string(),
+    purchasedAt: v.number(),
   }).index("by_userId", ["userId"]),
 });

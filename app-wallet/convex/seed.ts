@@ -13,7 +13,7 @@ export const populateData = mutation({
       name: "Alex Schmidt",
       email: "alex@test.com",
       role: "tourist",
-      jfBalance: 500,
+      greenTokensBalance: 500,
       passSerialNumber: "PSN-001",
     });
 
@@ -21,7 +21,7 @@ export const populateData = mutation({
       name: "Jungfrau Partner",
       email: "partner@jungfrau.com",
       role: "partner",
-      jfBalance: 0,
+      greenTokensBalance: 0,
       passSerialNumber: "PSN-002",
     });
 
