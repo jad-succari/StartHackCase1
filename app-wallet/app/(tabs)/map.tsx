@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Animated,
   ActivityIndicator,
+  Platform,
 } from 'react-native'
 import { useQuery } from 'convex/react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -14,12 +15,25 @@ import Mapbox, {
   Camera,
   MapView,
   PointAnnotation,
+  MarkerView,
   RasterDemSource,
   Terrain,
 } from '@rnmapbox/maps'
 import { api } from '../../convex/_generated/api'
 
-Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_TOKEN ?? '')
+const MAPBOX_TOKEN = process.env.EXPO_PUBLIC_MAPBOX_TOKEN ?? ''
+Mapbox.setAccessToken(MAPBOX_TOKEN)
+
+// On web, mapbox-gl needs the token set directly on its global object
+if (Platform.OS === 'web' && MAPBOX_TOKEN) {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const mapboxgl = require('mapbox-gl')
+    mapboxgl.accessToken = MAPBOX_TOKEN
+  } catch (_) {
+    // not in web context
+  }
+}
 
 // ─── Palette ────────────────────────────────────────────────
 const TEAL      = '#2A8FA0'
@@ -187,22 +201,41 @@ export default function MapScreen() {
           animationDuration={2000}
         />
 
-        {/* 3D Terrain */}
-        <RasterDemSource
-          id="mapbox-dem"
-          url="mapbox://mapbox.mapbox-terrain-dem-v1"
-          tileSize={512}
-          maxZoomLevel={14}
-        />
-        <Terrain
-          sourceID="mapbox-dem"
-          style={{ exaggeration: 1.8 }}
-        />
+        {/* 3D Terrain — native only (web doesn't support RasterDemSource/Terrain) */}
+        {Platform.OS !== 'web' && RasterDemSource && Terrain && (
+          <>
+            <RasterDemSource
+              id="mapbox-dem"
+              url="mapbox://mapbox.mapbox-terrain-dem-v1"
+              tileSize={512}
+              maxZoomLevel={14}
+            />
+            <Terrain
+              sourceID="mapbox-dem"
+              style={{ exaggeration: 1.8 }}
+            />
+          </>
+        )}
 
-        {/* Markers */}
+        {/* Markers — MarkerView on web, PointAnnotation on native */}
         {filtered.map((partner) => {
           const color = getCatColor(partner.category)
           const emoji = getCatEmoji(partner.category)
+          if (Platform.OS === 'web') {
+            return (
+              <MarkerView
+                key={partner._id}
+                id={partner._id}
+                coordinate={[partner.lng!, partner.lat!]}
+              >
+                <TouchableOpacity onPress={() => openSheet(partner)} activeOpacity={0.8}>
+                  <View style={[s.pin, { backgroundColor: color }]}>
+                    <Text style={s.pinEmoji}>{emoji}</Text>
+                  </View>
+                </TouchableOpacity>
+              </MarkerView>
+            )
+          }
           return (
             <PointAnnotation
               key={partner._id}
