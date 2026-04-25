@@ -93,7 +93,7 @@ export default function BookOfferScreen() {
           Book an offer
         </Text>
         <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>
-          Balance: {balance} GT available
+          Solde : {balance} LAKE disponibles
         </Text>
       </YStack>
 
@@ -143,7 +143,7 @@ export default function BookOfferScreen() {
                     <Text style={{ fontFamily: 'Georgia', fontSize: 36, fontWeight: '500', color: GOLD, lineHeight: 40 }}>
                       {cost}
                     </Text>
-                    <Text style={{ fontFamily: 'Georgia', fontSize: 16, color: 'rgba(201,168,76,0.5)' }}> GT</Text>
+                    <Text style={{ fontFamily: 'Georgia', fontSize: 16, color: 'rgba(201,168,76,0.5)' }}> LAKE</Text>
                   </XStack>
                   <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
                     {cost.toFixed(2)} CHF
@@ -242,11 +242,11 @@ export default function BookOfferScreen() {
                 <Text style={{ fontSize: 10, fontWeight: '600', color: INK_LIGHT, letterSpacing: 1, textTransform: 'uppercase' }}>
                   Your balance
                 </Text>
-                <Text style={{ fontSize: 14, color: INK_MID }}>{balance} GT · {balance.toFixed(2)} CHF</Text>
+                <Text style={{ fontSize: 14, color: INK_MID }}>{balance} LAKE · {balance.toFixed(2)} CHF</Text>
               </YStack>
               <YStack style={{ alignItems: 'flex-end' }} gap={2}>
                 <Text style={{ fontSize: 14, fontWeight: '700', color: canAfford ? TEAL : RED }}>
-                  {canAfford ? `−${cost} GT` : `${cost - balance} GT short`}
+                  {canAfford ? `−${cost} LAKE` : `${cost - balance} LAKE manquants`}
                 </Text>
                 <Text style={{ fontSize: 11, color: INK_LIGHT }}>
                   {(cost - 0.01).toFixed(2)} CHF
@@ -268,7 +268,7 @@ export default function BookOfferScreen() {
                   ⚠️  Insufficient balance
                 </Text>
                 <Text style={{ fontSize: 12, color: RED, opacity: 0.8 }}>
-                  You need {cost - balance} more GT to book this offer.
+                  Il vous manque {cost - balance} LAKE pour réserver cette offre.
                 </Text>
               </YStack>
             )}
@@ -306,7 +306,7 @@ export default function BookOfferScreen() {
                   alignItems: 'center',
                 }}
               >
-                <Text style={{ fontSize: 14, fontWeight: '600', color: INK }}>💳  Buy tokens</Text>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: INK }}>💳  Acheter des LAKE</Text>
               </TouchableOpacity>
             )}
           </YStack>
@@ -362,7 +362,7 @@ export default function BookOfferScreen() {
               Booking failed
             </Text>
             <Text style={{ fontSize: 15, color: INK_LIGHT, textAlign: 'center', lineHeight: 22 }}>
-              You don't have enough Green Tokens for this offer.
+              Vous n'avez pas assez de LAKE pour cette offre.
             </Text>
           </YStack>
           <TouchableOpacity
@@ -376,7 +376,7 @@ export default function BookOfferScreen() {
               alignItems: 'center',
             }}
           >
-            <Text style={{ fontSize: 15, fontWeight: '600', color: 'white' }}>💳  Buy tokens</Text>
+            <Text style={{ fontSize: 15, fontWeight: '600', color: 'white' }}>💳  Acheter des LAKE</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => router.back()} style={{ paddingVertical: 8 }}>
             <Text style={{ fontSize: 13, color: INK_LIGHT }}>← Back to offers</Text>

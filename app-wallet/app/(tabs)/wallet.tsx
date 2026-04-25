@@ -1,7 +1,10 @@
 import { router } from 'expo-router'
-import { TouchableOpacity, View } from 'react-native'
+import {
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import { useQuery } from 'convex/react'
-import Svg, { Line, Path, Polygon, Rect } from 'react-native-svg'
+import Svg, { Circle, Line, Path, Polygon, Rect } from 'react-native-svg'
 import { api } from '../../convex/_generated/api'
 import { ScrollView, Separator, Spinner, Text, XStack, YStack } from 'tamagui'
 
@@ -11,9 +14,9 @@ const GOLD_BRD  = 'rgba(201,168,76,0.22)'
 const INK       = '#1A1612'
 const INK_LIGHT = '#A89E92'
 const BG        = '#FAF8F5'
-const TEAL      = '#2A8FA0'
-const TEAL_BG   = 'rgba(42,143,160,0.09)'
-const TEAL_BRD  = 'rgba(42,143,160,0.22)'
+const TEAL      = '#0D9488'
+const TEAL_BG   = 'rgba(13,148,136,0.09)'
+const TEAL_BRD  = 'rgba(13,148,136,0.22)'
 const ERROR     = '#B8362A'
 const BORDER    = 'rgba(26,22,18,0.07)'
 
@@ -53,10 +56,10 @@ export default function WalletScreen() {
         {/* ── Page header ── */}
         <YStack paddingHorizontal="$5" paddingBottom="$4" gap="$1">
           <Text fontSize={32} fontWeight="400" color={INK} style={{ letterSpacing: -0.5, lineHeight: 36 }}>
-            My Wallet
+            Mon Wallet
           </Text>
           <Text color={INK_LIGHT} fontSize="$3">
-            Current balance · Gold Status
+            Solde LAKE · Statut Gold
           </Text>
         </YStack>
 
@@ -146,7 +149,7 @@ export default function WalletScreen() {
                   marginLeft: 4,
                 }}
               >
-                GT
+                LAKE
               </Text>
             </XStack>
 
@@ -180,7 +183,7 @@ export default function WalletScreen() {
                 }}
               >
                 <Text style={{ fontSize: 13, fontWeight: '500', color: 'rgba(255,255,255,0.88)' }}>
-                  Buy Tokens
+                  Acheter LAKE
                 </Text>
               </TouchableOpacity>
             </XStack>
@@ -194,19 +197,20 @@ export default function WalletScreen() {
             value={`${experiences}`}
             label="Experiences"
           />
-          <TouchableOpacity style={{
-            flex: 1,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-            backgroundColor: '#111111',
-            borderRadius: 9999,
-            paddingHorizontal: 12,
-            paddingVertical: 8,
-            borderWidth: 1,
-            borderColor: 'rgba(255,255,255,0.12)',
-          }}>
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6,
+              backgroundColor: '#111111',
+              borderRadius: 9999,
+              paddingHorizontal: 12,
+              paddingVertical: 8,
+              borderWidth: 1,
+              borderColor: 'rgba(255,255,255,0.12)',
+            }}>
             <Text style={{ fontSize: 14 }}>💳</Text>
             <Text style={{ fontSize: 11, fontWeight: '600', color: '#FFFFFF' }} numberOfLines={1}>
               Open in Wallet
@@ -233,7 +237,7 @@ export default function WalletScreen() {
               textTransform: 'uppercase',
             }}
           >
-            Recent Transactions
+            Transactions récentes
           </Text>
 
           {transactions === undefined ? (
@@ -323,7 +327,7 @@ export default function WalletScreen() {
                         style={{ fontSize: 13, fontWeight: '500', fontFamily: 'Courier New' }}
                         color={isEarned ? TEAL : ERROR}
                       >
-                        {isEarned ? '+' : ''}{tx.tokensEarnedOrSpent} GT
+                        {isEarned ? '+' : ''}{tx.tokensEarnedOrSpent} LAKE
                       </Text>
                     </XStack>
                   </View>

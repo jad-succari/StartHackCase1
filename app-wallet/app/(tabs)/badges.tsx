@@ -35,7 +35,7 @@ type Benefit = { icon: string; text: string }
 
 const BADGE_BENEFITS: Record<string, Benefit[]> = {
   first: [
-    { icon: '🎁', text: '+5 GT offerts sur votre prochain booking' },
+    { icon: '🎁', text: '+5 LAKE offerts sur votre prochain booking' },
     { icon: '⭐', text: 'Accès aux offres early bird' },
   ],
   ski: [
@@ -44,7 +44,7 @@ const BADGE_BENEFITS: Record<string, Benefit[]> = {
     { icon: '🏂', text: 'Accès aux pistes réservées membres' },
   ],
   eco: [
-    { icon: '🌱', text: '+15 GT bonus par activité éco-certifiée' },
+    { icon: '🌱', text: '+15 LAKE bonus par activité éco-certifiée' },
     { icon: '♻️', text: 'Badge visible sur votre profil voyageur' },
     { icon: '🌍', text: 'Expériences durables exclusives débloquées' },
   ],
@@ -64,7 +64,7 @@ const BADGE_BENEFITS: Record<string, Benefit[]> = {
     { icon: '📸', text: 'Séance photo souvenir incluse' },
   ],
   collector: [
-    { icon: '🎁', text: 'Bonus GT mystère chaque semaine' },
+    { icon: '🎁', text: 'Bonus LAKE mystère chaque semaine' },
     { icon: '🏷️', text: 'Réductions partenaires exclusives' },
     { icon: '🔑', text: 'Accès au club Collectors EtherLaken' },
   ],
@@ -74,7 +74,7 @@ const BADGE_BENEFITS: Record<string, Benefit[]> = {
     { icon: '💎', text: 'Conciergerie personnelle dédiée' },
   ],
   spender: [
-    { icon: '💰', text: 'Cashback 5% en GT sur chaque dépense' },
+    { icon: '💰', text: 'Cashback 5% en LAKE sur chaque dépense' },
     { icon: '🛍️', text: 'Remises dans les boutiques partenaires' },
     { icon: '🎪', text: 'Avant-première sur les nouvelles offres' },
   ],

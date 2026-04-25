@@ -92,7 +92,7 @@ export default function AdminScreen() {
                 {stats.totalTokensInCirculation}
               </Text>
               <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>
-                GT across all tourists
+                LAKE en circulation
               </Text>
             </YStack>
 
@@ -167,7 +167,7 @@ export default function AdminScreen() {
                           <Text style={{ fontFamily: 'Georgia', fontSize: 28, fontWeight: '500', color: INK }}>
                             {partner.pendingTokens}
                           </Text>
-                          <Text style={{ fontSize: 13, color: INK_LIGHT }}> GT</Text>
+                          <Text style={{ fontSize: 13, color: INK_LIGHT }}> LAKE</Text>
                         </XStack>
                         <Text style={{ fontSize: 12, color: GOLD, fontWeight: '600' }}>
                           {partner.pendingTokens.toFixed(2)} CHF owed

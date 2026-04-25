@@ -18,6 +18,7 @@ import Mapbox, {
   MarkerView,
   RasterDemSource,
   Terrain,
+  UserLocation,
 } from '@rnmapbox/maps'
 import { api } from '../../convex/_generated/api'
 
@@ -84,7 +85,35 @@ const CATEGORIES = [
   { id: 'Transport',  label: 'Transport',  emoji: '🚡' },
   { id: 'Ski',        label: 'Ski',        emoji: '⛷️' },
   { id: 'Restaurant', label: 'Restaurant', emoji: '🍽️' },
-  { id: 'Activity',   label: 'Activity',   emoji: '🏔️' },
+  { id: 'Activity',   label: 'Activité',   emoji: '🏔️' },
+]
+
+const PARTNERS_HARDCODED: Partner[] = [
+  {
+    _id: 'hc-1', name: 'Schilthornbahn AG', category: 'Transport',
+    locationName: 'Mürren', isEco: true, lat: 46.5592, lng: 7.8986,
+    offers: [{ _id: 'hco-1', title: 'Schilthorn · Piz Gloria', tokenCost: 90, savingsCHF: 42, description: 'Accès panoramique · Câble car' }],
+  },
+  {
+    _id: 'hc-2', name: 'Jungfrau Railways', category: 'Transport',
+    locationName: 'Grindelwald', isEco: true, lat: 46.5751, lng: 7.9857,
+    offers: [{ _id: 'hco-2', title: 'Jungfraujoch', tokenCost: 150, savingsCHF: 38, description: 'Top of Europe · Train à crémaillère' }],
+  },
+  {
+    _id: 'hc-3', name: 'Grindelwald Sports', category: 'Ski',
+    locationName: 'Grindelwald', isEco: false, lat: 46.6244, lng: 8.0409,
+    offers: [{ _id: 'hco-3', title: 'Ski Grindelwald First', tokenCost: 120, savingsCHF: 55, description: 'Domaine skiable · Pistes toutes niveaux' }],
+  },
+  {
+    _id: 'hc-4', name: 'Restaurant Zur Mühle', category: 'Restaurant',
+    locationName: 'Interlaken', isEco: true, lat: 46.6863, lng: 7.8632,
+    offers: [{ _id: 'hco-4', title: 'Fondue au chalet', tokenCost: 30, savingsCHF: 18, description: 'Fondue traditionnelle · Produits locaux' }],
+  },
+  {
+    _id: 'hc-5', name: 'Harder Kulm', category: 'Activity',
+    locationName: 'Interlaken', isEco: false, lat: 46.7012, lng: 7.8756,
+    offers: [{ _id: 'hco-5', title: 'Harder Kulm · Vue 360°', tokenCost: 60, savingsCHF: 22, description: 'Téléphérique · Panorama Alpes' }],
+  },
 ]
 
 const DEFAULT_CENTER: [number, number] = [7.8632, 46.6863]
@@ -120,7 +149,8 @@ type Partner = {
 export default function MapScreen() {
   const { top, bottom } = useSafeAreaInsets()
   const rawPartners = useQuery(api.partners.getPartners)
-  const partners    = rawPartners as Partner[] | undefined
+  const convexPartners = rawPartners as Partner[] | undefined
+  const partners = (convexPartners && convexPartners.length > 0) ? convexPartners : PARTNERS_HARDCODED
 
   const [activeCategory, setActiveCategory] = useState('all')
   const [selected, setSelected]             = useState<Partner | null>(null)
@@ -128,7 +158,7 @@ export default function MapScreen() {
   const sheetAnim = useRef(new Animated.Value(SHEET_HEIGHT)).current
   const cameraRef = useRef<any>(null)
 
-  const filtered = (partners ?? []).filter(
+  const filtered = partners.filter(
     (p) => (activeCategory === 'all' || p.category === activeCategory) && p.lat && p.lng
   )
 
@@ -185,7 +215,7 @@ export default function MapScreen() {
       {/* ── Map ─────────────────────────────────────────── */}
       <MapView
         style={StyleSheet.absoluteFillObject}
-        styleURL="mapbox://styles/mapbox/outdoors-v12"
+        styleURL="mapbox://styles/mapbox/satellite-streets-v12"
         logoEnabled={false}
         attributionEnabled={false}
         compassEnabled
@@ -200,6 +230,8 @@ export default function MapScreen() {
           animationMode="flyTo"
           animationDuration={2000}
         />
+
+        {Platform.OS !== 'web' && UserLocation && <UserLocation visible={true} />}
 
         {/* 3D Terrain — native only (web doesn't support RasterDemSource/Terrain) */}
         {Platform.OS !== 'web' && RasterDemSource && Terrain && (
@@ -379,7 +411,7 @@ export default function MapScreen() {
                   </Text>
                   <View style={s.offerPriceRow}>
                     <Text style={s.offerGTAmount}>{offer.tokenCost}</Text>
-                    <Text style={s.offerGTLabel}> GT</Text>
+                    <Text style={s.offerGTLabel}> LAKE</Text>
                   </View>
                   {offer.savingsCHF ? (
                     <View style={s.savingsBadge}>

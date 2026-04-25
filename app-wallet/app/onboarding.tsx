@@ -310,7 +310,7 @@ function Step2({
             }}
           />
           <Text style={{ fontSize: 11, color: INK_LIGHT, marginTop: 6 }}>
-            Entrez le code d'un ami pour obtenir 5 GT bonus chacun.
+            Entrez le code d'un ami pour obtenir 5 LAKE bonus chacun.
           </Text>
         </View>
 
@@ -434,7 +434,7 @@ function Step3({
             {referralCode}
           </Text>
           <Text style={{ fontSize: 12, color: INK_LIGHT, marginTop: 8, textAlign: 'center' }}>
-            Partagez ce code et gagnez 10 GT par ami parrainé.
+            Partagez ce code et gagnez 10 LAKE par ami parrainé.
           </Text>
         </View>
       </YStack>

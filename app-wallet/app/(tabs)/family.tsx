@@ -132,7 +132,7 @@ function FamilyDashboard({
     if (isNaN(n) || n <= 0) return
 
     if (n > currentBalance) {
-      setErrorMsg(`Solde insuffisant — vous avez seulement ${currentBalance} GT`)
+      setErrorMsg(`Solde insuffisant — vous avez seulement ${currentBalance} LAKE`)
       return
     }
 
@@ -162,7 +162,7 @@ function FamilyDashboard({
         style={[s.toast, { transform: [{ translateY: toastY }] }]}
         pointerEvents="none"
       >
-        <Text style={s.toastText}>✅ Tokens envoyés !</Text>
+        <Text style={s.toastText}>✅ LAKE envoyés !</Text>
       </Animated.View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
@@ -176,7 +176,7 @@ function FamilyDashboard({
           <Text style={s.headerMembers}>
             {dashboard.members.length} membre{dashboard.members.length !== 1 ? 's' : ''}
           </Text>
-          <Text style={s.headerTotal}>{totalGT} GT</Text>
+          <Text style={s.headerTotal}>{totalGT} LAKE</Text>
           <Text style={s.headerSub}>répartis entre les membres</Text>
         </View>
 
@@ -200,7 +200,7 @@ function FamilyDashboard({
                     </View>
                   )}
                 </View>
-                <Text style={s.memberBalance}>🌿 {member.greenTokensBalance} GT</Text>
+                <Text style={s.memberBalance}>🌿 {member.greenTokensBalance} LAKE</Text>
               </View>
             </View>
           )
@@ -209,7 +209,7 @@ function FamilyDashboard({
         {/* ── Transfer ── */}
         {others.length > 0 && (
           <View style={s.transferCard}>
-            <Text style={s.transferTitle}>Envoyer des tokens</Text>
+            <Text style={s.transferTitle}>Envoyer des LAKE</Text>
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View style={{ flexDirection: 'row', gap: 8, paddingVertical: 2 }}>
@@ -236,7 +236,7 @@ function FamilyDashboard({
                 value={amount}
                 onChangeText={(v) => { setAmount(v); clearError() }}
                 keyboardType="numeric"
-                placeholder="Montant en GT"
+                placeholder="Montant en LAKE"
                 placeholderTextColor="#9CA3AF"
                 style={[s.input, !!errorMsg && s.inputError]}
               />

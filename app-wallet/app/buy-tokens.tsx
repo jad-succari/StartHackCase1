@@ -67,10 +67,10 @@ export default function BuyTokensScreen() {
           </TouchableOpacity>
         )}
         <Text style={{ fontFamily: 'Georgia', fontSize: 28, fontWeight: '400', color: GOLD, letterSpacing: -0.5 }}>
-          Buy Tokens
+          Acheter des LAKE
         </Text>
         <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>
-          Balance: {user?.greenTokensBalance ?? 0} GT
+          Solde : {user?.greenTokensBalance ?? 0} LAKE
         </Text>
       </YStack>
 
@@ -110,7 +110,7 @@ export default function BuyTokensScreen() {
                           lineHeight: 36,
                         }}>
                           {p.tokens}
-                          <Text style={{ fontFamily: 'Georgia', fontSize: 16, color: selected ? 'rgba(201,168,76,0.5)' : INK_LIGHT }}> GT</Text>
+                          <Text style={{ fontFamily: 'Georgia', fontSize: 16, color: selected ? 'rgba(201,168,76,0.5)' : INK_LIGHT }}> LAKE</Text>
                         </Text>
                         {p.popular && (
                           <View style={{
@@ -136,7 +136,7 @@ export default function BuyTokensScreen() {
                         <Text style={{ fontSize: 14, fontWeight: '400', color: selected ? 'rgba(201,168,76,0.6)' : INK_LIGHT }}> CHF</Text>
                       </Text>
                       <Text style={{ fontSize: 11, color: selected ? 'rgba(201,168,76,0.4)' : INK_LIGHT }}>
-                        {((p.priceCHF / p.tokens) * 100).toFixed(1)} ct/GT
+                        {((p.priceCHF / p.tokens) * 100).toFixed(1)} ct/LAKE
                       </Text>
                     </YStack>
                   </XStack>
@@ -182,7 +182,7 @@ export default function BuyTokensScreen() {
                   Summary
                 </Text>
                 <Text style={{ fontSize: 14, color: INK_MID }}>
-                  {pkg.tokens} GT · {pkg.label}
+                  {pkg.tokens} LAKE · {pkg.label}
                 </Text>
               </YStack>
               <Text style={{ fontFamily: 'Georgia', fontSize: 26, fontWeight: '500', color: INK }}>
@@ -274,7 +274,7 @@ export default function BuyTokensScreen() {
               Payment successful
             </Text>
             <Text style={{ fontSize: 15, color: INK_LIGHT, textAlign: 'center', lineHeight: 22 }}>
-              {pkg.tokens} Green Tokens have been added to your wallet.
+              {pkg.tokens} LAKE ont été ajoutés à votre wallet.
             </Text>
           </YStack>
           <TouchableOpacity

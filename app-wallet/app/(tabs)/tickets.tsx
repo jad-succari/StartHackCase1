@@ -198,7 +198,7 @@ function TicketCard({
         <View style={{ width: 1, backgroundColor: BORDER, marginHorizontal: 12 }} />
         <InfoCell
           label="COST"
-          value={`${ticket.tokenCost} GT`}
+          value={`${ticket.tokenCost} LAKE`}
           valueColor={isValide ? TEAL : INK_LIGHT}
         />
       </XStack>

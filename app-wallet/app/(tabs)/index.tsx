@@ -15,21 +15,21 @@ import {
   YStack,
 } from 'tamagui'
 
-const TEAL      = '#2A8FA0'
-const TEAL_DARK = '#1E7A8C'
-const TEAL_BG   = 'rgba(42,143,160,0.09)'
-const TEAL_BRD  = 'rgba(42,143,160,0.22)'
+const TEAL      = '#0D9488'
+const TEAL_DARK = '#0a7c72'
+const TEAL_BG   = 'rgba(13,148,136,0.09)'
+const TEAL_BRD  = 'rgba(13,148,136,0.22)'
 const INK       = '#1A1612'
 const INK_LIGHT = '#A89E92'
 const BG        = '#FAF8F5'
 
-const HERO_URI    = 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&q=80'
+const HERO_URI = 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&q=80'
 
 const CATEGORIES = ['All', 'Ski', 'Restaurant', 'Transport', 'Activity']
 
-export default function WalletScreen() {
-  const user = useQuery(api.wallet.getUser)
-  const offers = useQuery(api.wallet.getOffers)
+export default function DiscoverScreen() {
+  const user         = useQuery(api.wallet.getUser)
+  const offers       = useQuery(api.wallet.getOffers)
   const populateData = useMutation(api.seed.populateData)
   const [selectedCategory, setSelectedCategory] = useState('All')
 
@@ -39,7 +39,7 @@ export default function WalletScreen() {
     return (
       <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} backgroundColor={BG} gap="$3">
         <Spinner size="large" color={TEAL} />
-        <Text color={INK_LIGHT}>Loading...</Text>
+        <Text color={INK_LIGHT}>Chargement...</Text>
       </YStack>
     )
   }
@@ -49,13 +49,13 @@ export default function WalletScreen() {
       <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} padding="$6" gap="$5" backgroundColor={BG}>
         <Text style={{ fontSize: 64 }}>🏔️</Text>
         <YStack gap="$2" style={{ alignItems: 'center' }}>
-          <H2 style={{ textAlign: 'center' }} color={INK}>JungfrauWallet</H2>
+          <H2 style={{ textAlign: 'center' }} color={INK}>EtherLaken</H2>
           <Text style={{ textAlign: 'center', fontSize: 14 }} color={INK_LIGHT}>
-            Start by loading the demo data to explore the sustainable tourism experience.
+            Chargez les données de démonstration pour explorer l'expérience touristique.
           </Text>
         </YStack>
         <Button size="$5" backgroundColor={TEAL} borderRadius="$4" width="100%" onPress={() => void populateData({})}>
-          <Text color="white" fontWeight="bold" fontSize="$4">Load test data</Text>
+          <Text color="white" fontWeight="bold" fontSize="$4">Initialiser les données</Text>
         </Button>
       </YStack>
     )
@@ -103,7 +103,7 @@ export default function WalletScreen() {
             <XStack paddingHorizontal={18} paddingVertical={10} style={{ alignItems: 'center' }} gap={8}>
               <Text color="white" fontSize="$4">🏔️</Text>
               <Text color="white" fontSize="$3" fontWeight="500">
-                Hi, {user.name.split(' ')[0]}
+                Bonjour, {user.name.split(' ')[0]}
               </Text>
             </XStack>
           </BlurView>
@@ -113,14 +113,14 @@ export default function WalletScreen() {
             tint="dark"
             style={{
               borderRadius: 999, overflow: 'hidden',
-              backgroundColor: 'rgba(42,143,160,0.75)',
+              backgroundColor: 'rgba(13,148,136,0.75)',
               borderWidth: 1, borderColor: 'rgba(255,255,255,0.22)',
             }}
           >
             <XStack paddingHorizontal={14} paddingVertical={9} style={{ alignItems: 'center' }} gap={6}>
               <Text color="white" fontSize="$2">🌿</Text>
               <Text color="white" fontSize="$3" fontWeight="700">
-                {user.greenTokensBalance} GT
+                {user.greenTokensBalance} LAKE
               </Text>
             </XStack>
           </BlurView>
@@ -139,10 +139,10 @@ export default function WalletScreen() {
 
           {/* Section header */}
           <XStack justifyContent="space-between" style={{ alignItems: 'baseline' }} paddingTop="$4">
-            <H2 fontSize="$6" color={INK}>Available Offers</H2>
+            <H2 fontSize="$6" color={INK}>Offres disponibles</H2>
             {offers !== undefined && (
               <Text fontSize="$2" color={TEAL} fontWeight="600">
-                {offers.length} offer{offers.length !== 1 ? 's' : ''}
+                {offers.length} offre{offers.length !== 1 ? 's' : ''}
               </Text>
             )}
           </XStack>
@@ -179,7 +179,7 @@ export default function WalletScreen() {
               <Spinner color={TEAL} />
             </YStack>
           ) : filteredOffers.length === 0 ? (
-            <Text color={INK_LIGHT} paddingTop="$2">No offers available in this category.</Text>
+            <Text color={INK_LIGHT} paddingTop="$2">Aucune offre dans cette catégorie.</Text>
           ) : (
             <YStack gap="$3">
               {filteredOffers.map((offer) => (
@@ -227,22 +227,18 @@ function OfferRow({ offer, onBook }: OfferRowProps) {
     }}>
       <YStack padding="$3" gap="$2">
 
-        {/* PARTNER label */}
         <Text style={{ fontSize: 11, color: INK_LIGHT, fontWeight: '600', letterSpacing: 0.6 }}>
-          PARTNER
+          PARTENAIRE
         </Text>
 
-        {/* Title */}
         <Text style={{ fontSize: 15, fontWeight: '700', color: INK, lineHeight: 21 }} numberOfLines={2}>
           {offer.title}
         </Text>
 
-        {/* Description */}
         <Text style={{ fontSize: 12, color: INK_LIGHT, lineHeight: 17 }} numberOfLines={2}>
           {offer.description}
         </Text>
 
-        {/* Price row */}
         <XStack style={{ alignItems: 'center' }} gap={10} paddingTop={2}>
           {offer.originalPriceCHF != null && (
             <Text style={{ fontSize: 13, color: INK_LIGHT, textDecorationLine: 'line-through' }}>
@@ -258,7 +254,7 @@ function OfferRow({ offer, onBook }: OfferRowProps) {
             borderColor: TEAL_BRD,
           }}>
             <Text style={{ fontSize: 13, fontWeight: '700', color: TEAL }}>
-              {offer.tokenCost} GT
+              {offer.tokenCost} LAKE
             </Text>
           </View>
         </XStack>
@@ -274,7 +270,6 @@ function OfferRow({ offer, onBook }: OfferRowProps) {
           overflow: 'hidden',
         })}
       >
-        {/* Discount badge */}
         <View style={{
           paddingHorizontal: 18,
           paddingVertical: 13,
@@ -288,10 +283,9 @@ function OfferRow({ offer, onBook }: OfferRowProps) {
           </Text>
         </View>
 
-        {/* Book now */}
         <View style={{ flex: 1, paddingVertical: 13, justifyContent: 'center', alignItems: 'center' }}>
           <Text style={{ color: 'white', fontWeight: '600', fontSize: 14 }}>
-            Book now
+            Réserver
           </Text>
         </View>
       </Pressable>
