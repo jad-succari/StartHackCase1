@@ -1,25 +1,40 @@
 import { useState } from 'react'
+import { TouchableOpacity } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '../convex/_generated/api'
 import type { Id } from '../convex/_generated/dataModel'
-import {
-  Button,
-  Card,
-  H2,
-  Paragraph,
-  Spinner,
-  Text,
-  XStack,
-  YStack,
-} from 'tamagui'
+import { ScrollView, Spinner, Text, XStack, YStack } from 'tamagui'
 
-const GREEN_DARK = '#1B5E20'
-const GREEN_MID = '#2E7D32'
-const GREEN_LIGHT = '#E8F5E9'
-const RED = '#C62828'
+const INK       = '#1A1612'
+const INK_MID   = '#6B5E52'
+const INK_LIGHT = '#A89E92'
+const BG        = '#FAF8F5'
+const TEAL      = '#2A8FA0'
+const GOLD      = '#C9A84C'
+const BORDER    = 'rgba(26,22,18,0.08)'
+const RED       = '#B8362A'
 
 type Step = 'confirm' | 'processing' | 'success' | 'error'
+
+function todayStr(): string {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function shiftDate(str: string, days: number): string {
+  const [y, m, d] = str.split('-').map(Number)
+  const date = new Date(y, m - 1, d)
+  date.setDate(date.getDate() + days)
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+}
+
+function formatDate(str: string): string {
+  const [y, m, d] = str.split('-').map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString('en-GB', {
+    weekday: 'short', day: '2-digit', month: 'long', year: 'numeric',
+  })
+}
 
 export default function BookOfferScreen() {
   const { offerId } = useLocalSearchParams<{ offerId: string }>()
@@ -30,28 +45,24 @@ export default function BookOfferScreen() {
   )
   const bookOffer = useMutation(api.wallet.bookOffer)
   const [step, setStep] = useState<Step>('confirm')
+  const [validDate, setValidDate] = useState(todayStr)
 
   const handleBook = async () => {
     if (!user || !offer) return
     setStep('processing')
     await new Promise((r) => setTimeout(r, 2000))
     try {
-      await bookOffer({ userId: user._id, offerId: offer._id })
+      await bookOffer({ userId: user._id, offerId: offer._id, validDate })
       setStep('success')
-    } catch (err) {
-      const msg = (err as Error).message
-      if (msg.includes('Insufficient') || msg.includes('insuffisant')) {
-        setStep('error')
-      } else {
-        setStep('error')
-      }
+    } catch {
+      setStep('error')
     }
   }
 
   if (user === undefined || offer === undefined) {
     return (
-      <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Spinner size="large" color={GREEN_MID} />
+      <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} backgroundColor={BG}>
+        <Spinner size="large" color={TEAL} />
       </YStack>
     )
   }
@@ -59,182 +70,317 @@ export default function BookOfferScreen() {
   const balance = user?.greenTokensBalance ?? 0
   const cost = offer?.tokenCost ?? 0
   const canAfford = balance >= cost
+  const today = todayStr()
+  const isToday = validDate === today
 
   return (
-    <YStack style={{ flex: 1, backgroundColor: 'white' }}>
-      {/* Header */}
-      <YStack backgroundColor={GREEN_DARK} padding="$5" paddingTop="$10" gap="$1">
+    <YStack style={{ flex: 1, backgroundColor: BG }}>
+
+      {/* ── Header ── */}
+      <YStack
+        backgroundColor="#111111"
+        paddingHorizontal="$5"
+        paddingTop="$12"
+        paddingBottom="$5"
+        gap="$1"
+      >
         {(step === 'confirm' || step === 'error') && (
-          <Button
-            size="$3"
-            chromeless
-            onPress={() => router.back()}
-            alignSelf="flex-start"
-            marginBottom="$1"
-          >
-            <Text color="rgba(255,255,255,0.85)" fontSize="$4">← Retour</Text>
-          </Button>
+          <TouchableOpacity onPress={() => router.back()} style={{ marginBottom: 8, alignSelf: 'flex-start' }}>
+            <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', letterSpacing: 0.3 }}>← Back</Text>
+          </TouchableOpacity>
         )}
-        <H2 color="white">Réserver une offre</H2>
-        <Text color="rgba(255,255,255,0.65)" fontSize="$3">
-          Solde : {balance} GT disponibles
+        <Text style={{ fontFamily: 'Georgia', fontSize: 28, fontWeight: '400', color: 'white', letterSpacing: -0.5 }}>
+          Book an offer
+        </Text>
+        <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>
+          Balance: {balance} GT available
         </Text>
       </YStack>
 
-      {/* Étape 1 : Confirmation */}
+      {/* ── Step 1: Confirmation ── */}
       {step === 'confirm' && offer && (
-        <YStack padding="$4" gap="$4">
-          <Card borderRadius="$5" borderWidth={1} borderColor="$color4" overflow="hidden">
-            <YStack padding="$4" gap="$2">
-              <Text fontWeight="700" fontSize="$5">{offer.title}</Text>
-              {offer.description ? (
-                <Text color="$gray10" fontSize="$3">{offer.description}</Text>
-              ) : null}
+        <ScrollView>
+          <YStack padding="$4" gap="$4" paddingBottom="$8">
+
+            {/* Offer card */}
+            <YStack
+              backgroundColor="white"
+              borderRadius="$5"
+              borderWidth={1}
+              borderColor={BORDER}
+              overflow="hidden"
+              style={{
+                shadowColor: '#000',
+                shadowOpacity: 0.06,
+                shadowRadius: 12,
+                shadowOffset: { width: 0, height: 3 },
+              }}
+            >
+              <YStack padding="$4" gap="$2">
+                <Text style={{ fontSize: 11, fontWeight: '600', color: INK_LIGHT, letterSpacing: 1.5, textTransform: 'uppercase' }}>
+                  Selected offer
+                </Text>
+                <Text style={{ fontSize: 20, fontWeight: '700', color: INK, lineHeight: 26 }}>
+                  {offer.title}
+                </Text>
+                {offer.description ? (
+                  <Text style={{ fontSize: 13, color: INK_MID, lineHeight: 20 }}>{offer.description}</Text>
+                ) : null}
+              </YStack>
+
+              <XStack
+                backgroundColor="#111111"
+                paddingHorizontal="$4"
+                paddingVertical="$4"
+                justifyContent="space-between"
+                style={{ alignItems: 'center' }}
+              >
+                <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', letterSpacing: 0.5 }}>
+                  Booking cost
+                </Text>
+                <YStack style={{ alignItems: 'flex-end' }} gap={2}>
+                  <XStack style={{ alignItems: 'baseline' }} gap="$1">
+                    <Text style={{ fontFamily: 'Georgia', fontSize: 36, fontWeight: '500', color: GOLD, lineHeight: 40 }}>
+                      {cost}
+                    </Text>
+                    <Text style={{ fontFamily: 'Georgia', fontSize: 16, color: 'rgba(201,168,76,0.5)' }}> GT</Text>
+                  </XStack>
+                  <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
+                    {(cost - 0.01).toFixed(2)} CHF
+                  </Text>
+                </YStack>
+              </XStack>
             </YStack>
+
+            {/* ── Date picker ── */}
+            <YStack
+              backgroundColor="white"
+              borderRadius="$5"
+              borderWidth={1}
+              borderColor={BORDER}
+              overflow="hidden"
+              style={{
+                shadowColor: '#000',
+                shadowOpacity: 0.04,
+                shadowRadius: 8,
+                shadowOffset: { width: 0, height: 2 },
+              }}
+            >
+              <YStack padding="$4" paddingBottom="$3" gap="$1">
+                <Text style={{ fontSize: 11, fontWeight: '600', color: INK_LIGHT, letterSpacing: 1.5, textTransform: 'uppercase' }}>
+                  Activity date
+                </Text>
+                <Text style={{ fontSize: 12, color: INK_LIGHT, lineHeight: 18 }}>
+                  Your ticket will only be valid on this day.
+                </Text>
+              </YStack>
+
+              <XStack
+                paddingHorizontal="$4"
+                paddingBottom="$4"
+                style={{ alignItems: 'center' }}
+                gap="$3"
+              >
+                {/* Previous day */}
+                <TouchableOpacity
+                  onPress={() => setValidDate((d) => shiftDate(d, -1))}
+                  disabled={isToday}
+                  style={{
+                    width: 40, height: 40,
+                    borderRadius: 20,
+                    borderWidth: 1,
+                    borderColor: isToday ? 'rgba(26,22,18,0.06)' : BORDER,
+                    backgroundColor: isToday ? 'rgba(26,22,18,0.03)' : 'white',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Text style={{ fontSize: 18, color: isToday ? INK_LIGHT : INK, opacity: isToday ? 0.35 : 1 }}>‹</Text>
+                </TouchableOpacity>
+
+                {/* Date display */}
+                <YStack flex={1} style={{ alignItems: 'center' }} gap="$1">
+                  <Text style={{ fontSize: 16, fontWeight: '700', color: INK, textAlign: 'center' }}>
+                    {formatDate(validDate)}
+                  </Text>
+                  {isToday && (
+                    <Text style={{ fontSize: 10, fontWeight: '600', color: TEAL, letterSpacing: 1, textTransform: 'uppercase' }}>
+                      Today
+                    </Text>
+                  )}
+                </YStack>
+
+                {/* Next day */}
+                <TouchableOpacity
+                  onPress={() => setValidDate((d) => shiftDate(d, 1))}
+                  style={{
+                    width: 40, height: 40,
+                    borderRadius: 20,
+                    borderWidth: 1,
+                    borderColor: BORDER,
+                    backgroundColor: 'white',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Text style={{ fontSize: 18, color: INK }}>›</Text>
+                </TouchableOpacity>
+              </XStack>
+            </YStack>
+
+            {/* Balance summary */}
             <XStack
-              backgroundColor={GREEN_LIGHT}
+              backgroundColor="white"
+              borderRadius="$4"
+              borderWidth={1}
+              borderColor={BORDER}
               padding="$4"
               justifyContent="space-between"
               style={{ alignItems: 'center' }}
             >
-              <Text color={GREEN_DARK} fontWeight="600" fontSize="$3">
-                Coût de la réservation
-              </Text>
-              <XStack style={{ alignItems: 'baseline' }} gap="$1">
-                <Text fontWeight="900" fontSize="$7" color={GREEN_DARK}>
-                  {cost}
+              <YStack gap="$1">
+                <Text style={{ fontSize: 10, fontWeight: '600', color: INK_LIGHT, letterSpacing: 1, textTransform: 'uppercase' }}>
+                  Your balance
                 </Text>
-                <Text fontSize="$3" color={GREEN_MID} fontWeight="600"> GT</Text>
-              </XStack>
+                <Text style={{ fontSize: 14, color: INK_MID }}>{balance} GT · {(balance - 0.01).toFixed(2)} CHF</Text>
+              </YStack>
+              <YStack style={{ alignItems: 'flex-end' }} gap={2}>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: canAfford ? TEAL : RED }}>
+                  {canAfford ? `−${cost} GT` : `${cost - balance} GT short`}
+                </Text>
+                <Text style={{ fontSize: 11, color: INK_LIGHT }}>
+                  {(cost - 0.01).toFixed(2)} CHF
+                </Text>
+              </YStack>
             </XStack>
-          </Card>
 
-          {!canAfford && (
-            <YStack
-              backgroundColor="#FFEBEE"
-              borderRadius="$4"
-              padding="$3"
-              gap="$1"
+            {/* Insufficient balance warning */}
+            {!canAfford && (
+              <YStack
+                backgroundColor="rgba(184,54,42,0.07)"
+                borderRadius="$4"
+                borderWidth={1}
+                borderColor="rgba(184,54,42,0.2)"
+                padding="$3"
+                gap="$1"
+              >
+                <Text style={{ fontSize: 13, fontWeight: '700', color: RED }}>
+                  ⚠️  Insufficient balance
+                </Text>
+                <Text style={{ fontSize: 12, color: RED, opacity: 0.8 }}>
+                  You need {cost - balance} more GT to book this offer.
+                </Text>
+              </YStack>
+            )}
+
+            {/* Confirm button */}
+            <TouchableOpacity
+              onPress={() => void handleBook()}
+              disabled={!canAfford}
+              style={{
+                backgroundColor: canAfford ? TEAL : 'rgba(26,22,18,0.08)',
+                borderRadius: 14,
+                paddingVertical: 16,
+                alignItems: 'center',
+                shadowColor: canAfford ? TEAL : 'transparent',
+                shadowOpacity: 0.25,
+                shadowRadius: 10,
+                shadowOffset: { width: 0, height: 4 },
+              }}
             >
-              <Text color={RED} fontWeight="700" fontSize="$3">
-                ⚠️ Solde insuffisant
+              <Text style={{ fontSize: 15, fontWeight: '600', color: canAfford ? 'white' : INK_LIGHT }}>
+                {canAfford ? `Confirm for ${formatDate(validDate)}` : 'Insufficient balance'}
               </Text>
-              <Text color={RED} fontSize="$2">
-                Il vous manque {cost - balance} GT pour cette offre.
-              </Text>
-            </YStack>
-          )}
+            </TouchableOpacity>
 
-          <Button
-            size="$5"
-            backgroundColor={canAfford ? GREEN_MID : '$gray5'}
-            borderRadius="$4"
-            disabled={!canAfford}
-            onPress={() => void handleBook()}
-          >
-            <Text
-              color={canAfford ? 'white' : '$gray9'}
-              fontWeight="bold"
-              fontSize="$4"
-            >
-              {canAfford ? 'Confirmer la réservation' : 'Solde insuffisant'}
-            </Text>
-          </Button>
-
-          {!canAfford && (
-            <Button
-              size="$4"
-              borderRadius="$4"
-              borderWidth={1}
-              borderColor={GREEN_MID}
-              backgroundColor="white"
-              onPress={() => router.push('/buy-tokens')}
-            >
-              <Text color={GREEN_MID} fontWeight="600">💳 Acheter des tokens</Text>
-            </Button>
-          )}
-        </YStack>
+            {/* Buy tokens link if can't afford */}
+            {!canAfford && (
+              <TouchableOpacity
+                onPress={() => router.push('/buy-tokens')}
+                style={{
+                  backgroundColor: 'white',
+                  borderRadius: 14,
+                  borderWidth: 1,
+                  borderColor: BORDER,
+                  paddingVertical: 14,
+                  alignItems: 'center',
+                }}
+              >
+                <Text style={{ fontSize: 14, fontWeight: '600', color: INK }}>💳  Buy tokens</Text>
+              </TouchableOpacity>
+            )}
+          </YStack>
+        </ScrollView>
       )}
 
-      {/* Étape 2 : Traitement */}
+      {/* ── Step 2: Processing ── */}
       {step === 'processing' && (
-        <YStack
-          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-          gap="$4"
-        >
-          <Spinner size="large" color={GREEN_MID} />
-          <Text color="$gray10" fontSize="$4">Réservation en cours...</Text>
-          <Text color="$gray8" fontSize="$2">Veuillez patienter</Text>
+        <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} gap="$4">
+          <Spinner size="large" color={TEAL} />
+          <Text style={{ fontSize: 16, color: INK }}>Booking in progress...</Text>
+          <Text style={{ fontSize: 13, color: INK_LIGHT }}>Please wait</Text>
         </YStack>
       )}
 
-      {/* Étape 3 : Succès */}
+      {/* ── Step 3: Success ── */}
       {step === 'success' && (
-        <YStack
-          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-          padding="$6"
-          gap="$5"
-        >
-          <Text style={{ fontSize: 80 }}>✅</Text>
+        <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} padding="$6" gap="$5">
+          <Text style={{ fontSize: 72 }}>✅</Text>
           <YStack gap="$2" style={{ alignItems: 'center' }}>
-            <H2 style={{ textAlign: 'center' }}>Réservation confirmée !</H2>
-            <Paragraph style={{ textAlign: 'center' }} color="$gray10" fontSize="$4">
-              Votre billet est prêt. Présentez-le au contrôleur.
-            </Paragraph>
-          </YStack>
-          <Button
-            size="$5"
-            backgroundColor={GREEN_MID}
-            borderRadius="$4"
-            width="100%"
-            onPress={() => router.push('/(tabs)/tickets')}
-          >
-            <Text color="white" fontWeight="bold" fontSize="$4">
-              Voir mes billets
+            <Text style={{ fontFamily: 'Georgia', fontSize: 28, fontWeight: '400', color: INK, textAlign: 'center', letterSpacing: -0.5 }}>
+              Booking confirmed!
             </Text>
-          </Button>
-          <Button
-            size="$4"
-            chromeless
-            borderRadius="$4"
-            onPress={() => router.back()}
+            <Text style={{ fontSize: 15, color: INK_LIGHT, textAlign: 'center', lineHeight: 22 }}>
+              Valid on {formatDate(validDate)}.{'\n'}Show your ticket to the inspector.
+            </Text>
+          </YStack>
+          <TouchableOpacity
+            onPress={() => router.push('/(tabs)/tickets')}
+            style={{
+              backgroundColor: INK,
+              borderRadius: 14,
+              paddingVertical: 16,
+              paddingHorizontal: 32,
+              width: '100%',
+              alignItems: 'center',
+            }}
           >
-            <Text color="$gray10">← Retour aux offres</Text>
-          </Button>
+            <Text style={{ fontSize: 15, fontWeight: '600', color: 'white' }}>View my tickets</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.back()} style={{ paddingVertical: 8 }}>
+            <Text style={{ fontSize: 13, color: INK_LIGHT }}>← Back to offers</Text>
+          </TouchableOpacity>
         </YStack>
       )}
 
-      {/* Étape 4 : Erreur solde insuffisant */}
+      {/* ── Step 4: Error ── */}
       {step === 'error' && (
-        <YStack
-          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-          padding="$6"
-          gap="$5"
-        >
-          <Text style={{ fontSize: 80 }}>❌</Text>
+        <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} padding="$6" gap="$5">
+          <Text style={{ fontSize: 72 }}>❌</Text>
           <YStack gap="$2" style={{ alignItems: 'center' }}>
-            <H2 style={{ textAlign: 'center' }}>Solde insuffisant</H2>
-            <Paragraph style={{ textAlign: 'center' }} color="$gray10" fontSize="$4">
-              Vous n'avez pas assez de Green Tokens pour réserver cette offre.
-            </Paragraph>
+            <Text style={{ fontFamily: 'Georgia', fontSize: 28, fontWeight: '400', color: INK, textAlign: 'center', letterSpacing: -0.5 }}>
+              Booking failed
+            </Text>
+            <Text style={{ fontSize: 15, color: INK_LIGHT, textAlign: 'center', lineHeight: 22 }}>
+              You don't have enough Green Tokens for this offer.
+            </Text>
           </YStack>
-          <Button
-            size="$5"
-            backgroundColor={GREEN_MID}
-            borderRadius="$4"
-            width="100%"
+          <TouchableOpacity
             onPress={() => router.push('/buy-tokens')}
+            style={{
+              backgroundColor: INK,
+              borderRadius: 14,
+              paddingVertical: 16,
+              paddingHorizontal: 32,
+              width: '100%',
+              alignItems: 'center',
+            }}
           >
-            <Text color="white" fontWeight="bold" fontSize="$4">💳 Acheter des tokens</Text>
-          </Button>
-          <Button
-            size="$4"
-            chromeless
-            borderRadius="$4"
-            onPress={() => router.back()}
-          >
-            <Text color="$gray10">← Retour aux offres</Text>
-          </Button>
+            <Text style={{ fontSize: 15, fontWeight: '600', color: 'white' }}>💳  Buy tokens</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.back()} style={{ paddingVertical: 8 }}>
+            <Text style={{ fontSize: 13, color: INK_LIGHT }}>← Back to offers</Text>
+          </TouchableOpacity>
         </YStack>
       )}
     </YStack>

@@ -9,7 +9,9 @@ export default function RootLayout() {
   return (
     <ConvexProvider client={convex}>
       <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
-        <Stack screenOptions={{ headerShown: false }} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="onboarding" options={{ gestureEnabled: false, animation: 'fade' }} />
+        </Stack>
       </TamaguiProvider>
     </ConvexProvider>
   )

@@ -1,228 +1,264 @@
-import { Alert } from 'react-native'
+import { Image, View } from 'react-native'
+import { BlurView } from 'expo-blur'
 import { useMutation, useQuery } from 'convex/react'
-import { router } from 'expo-router'
+import { Redirect, router } from 'expo-router'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { api } from '../../convex/_generated/api'
+import { getRole } from '../../lib/roleStore'
 import {
   Button,
-  Card,
   H2,
   Paragraph,
   ScrollView,
-  Separator,
   Spinner,
   Text,
   XStack,
   YStack,
 } from 'tamagui'
 
-const GREEN_DARK = '#1B5E20'
-const GREEN_MID = '#2E7D32'
-const GREEN_LIGHT = '#E8F5E9'
-const GREEN_ACCENT = '#4CAF50'
+// EtherLaken palette
+const TEAL      = '#2A8FA0'
+const TEAL_BG   = 'rgba(42,143,160,0.09)'
+const TEAL_BRD  = 'rgba(42,143,160,0.22)'
+const INK       = '#1A1612'
+const INK_LIGHT = '#A89E92'
+const BG        = '#FAF8F5'
 
-function GreenButton({
-  children,
-  onPress,
-  width,
-}: {
-  children: string
-  onPress: () => void
-  width?: string
-}) {
-  return (
-    <Button
-      size="$5"
-      backgroundColor={GREEN_MID}
-      borderRadius="$4"
-      width={width}
-      onPress={onPress}
-    >
-      <Text color="white" fontWeight="bold" fontSize="$4">
-        {children}
-      </Text>
-    </Button>
-  )
-}
+const HERO_URI    = 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&q=80'
+const FALLBACK_URI = 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&q=80'
 
 export default function WalletScreen() {
+  const { top } = useSafeAreaInsets()
   const user = useQuery(api.wallet.getUser)
   const offers = useQuery(api.wallet.getOffers)
   const populateData = useMutation(api.seed.populateData)
+  const resetOffers = useMutation(api.seed.resetOffers)
+
+  if (getRole() === 'partner') return <Redirect href="/(tabs)/scanner" />
 
   if (user === undefined) {
     return (
-      <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} gap="$3">
-        <Spinner size="large" color={GREEN_MID} />
-        <Text color="$gray10">Chargement...</Text>
+      <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} backgroundColor={BG} gap="$3">
+        <Spinner size="large" color={TEAL} />
+        <Text color={INK_LIGHT}>Loading...</Text>
       </YStack>
     )
   }
 
   if (user === null) {
     return (
-      <YStack
-        style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-        padding="$6"
-        gap="$5"
-      >
+      <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} padding="$6" gap="$5" backgroundColor={BG}>
         <Text style={{ fontSize: 64 }}>🏔️</Text>
         <YStack gap="$2" style={{ alignItems: 'center' }}>
-          <H2 style={{ textAlign: 'center' }}>JungfrauWallet</H2>
-          <Paragraph style={{ textAlign: 'center' }} color="$gray10">
-            Commencez par initialiser les données de démonstration pour explorer l'expérience
-            touristique durable.
+          <H2 style={{ textAlign: 'center' }} color={INK}>JungfrauWallet</H2>
+          <Paragraph style={{ textAlign: 'center' }} color={INK_LIGHT}>
+            Start by loading the demo data to explore the sustainable tourism experience.
           </Paragraph>
         </YStack>
-        <GreenButton width="100%" onPress={() => void populateData({})}>
-          Initialiser les données de test
-        </GreenButton>
+        <Button size="$5" backgroundColor={TEAL} borderRadius="$4" width="100%" onPress={() => void populateData({})}>
+          <Text color="white" fontWeight="bold" fontSize="$4">Load test data</Text>
+        </Button>
       </YStack>
     )
   }
 
   return (
-    <ScrollView>
-      <YStack padding="$4" gap="$5" paddingBottom="$8">
-        {/* ── Header ── */}
-        <YStack marginTop="$2" gap="$1">
-          <Text color="$gray10" fontSize="$3">
-            Bienvenue,
-          </Text>
-          <H2>{user.name}</H2>
-        </YStack>
+    <YStack style={{ flex: 1 }} backgroundColor={BG}>
 
-        {/* ── Carte de solde ── */}
-        <Card elevation={4} borderRadius="$6" overflow="hidden">
-          <YStack backgroundColor={GREEN_DARK} padding="$5" gap="$2">
-            <Text color="rgba(255,255,255,0.65)" fontSize="$2">
-              SOLDE ACTUEL
-            </Text>
-            <XStack style={{ alignItems: 'baseline' }} gap="$2">
-              <Text color="white" fontWeight="900" style={{ fontSize: 60, lineHeight: 68 }}>
-                {user.greenTokensBalance}
-              </Text>
-              <Text color="rgba(255,255,255,0.75)" fontSize="$5" fontWeight="700">
-                GT
+      {/* ── Hero ── */}
+      <View style={{ height: 300, position: 'relative', overflow: 'hidden' }}>
+        <Image
+          source={{ uri: HERO_URI }}
+          style={{ position: 'absolute', width: '100%', height: '100%' }}
+          resizeMode="cover"
+        />
+        {/* Dark scrim at top for pill readability */}
+        <View style={{
+          position: 'absolute', top: 0, left: 0, right: 0, height: 110,
+          backgroundColor: 'rgba(0,0,0,0.32)',
+        }} />
+
+        {/* Glass pills row */}
+        <View style={{
+          position: 'absolute', top: top + 8, left: 16, right: 16,
+          flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+        }}>
+          {/* "Hi, [Name]" pill */}
+          <BlurView
+            intensity={55}
+            tint="dark"
+            style={{
+              borderRadius: 999, overflow: 'hidden',
+              borderWidth: 1, borderColor: 'rgba(255,255,255,0.28)',
+            }}
+          >
+            <XStack paddingHorizontal={18} paddingVertical={10} style={{ alignItems: 'center' }} gap={8}>
+              <Text color="white" fontSize="$4">🏔️</Text>
+              <Text color="white" fontSize="$3" fontWeight="500">
+                Hi, {user.name.split(' ')[0]}
               </Text>
             </XStack>
-            <Text color="rgba(255,255,255,0.65)" fontSize="$3">
-              Green Tokens disponibles
-            </Text>
-          </YStack>
-          <YStack backgroundColor={GREEN_MID} padding="$3">
-            <Text
-              color="rgba(255,255,255,0.85)"
-              fontSize="$2"
-              style={{ textAlign: 'center' }}
-            >
-              🌿 Programme Tourisme Durable · Région Jungfrau
-            </Text>
-          </YStack>
-        </Card>
+          </BlurView>
 
-        {/* ── Acheter des tokens ── */}
-        <GreenButton onPress={() => router.push('/buy-tokens')}>
-          💳 Acheter des Green Tokens
-        </GreenButton>
+          {/* GT balance pill */}
+          <BlurView
+            intensity={60}
+            tint="dark"
+            style={{
+              borderRadius: 999, overflow: 'hidden',
+              backgroundColor: 'rgba(42,143,160,0.75)',
+              borderWidth: 1, borderColor: 'rgba(255,255,255,0.22)',
+            }}
+          >
+            <XStack paddingHorizontal={14} paddingVertical={9} style={{ alignItems: 'center' }} gap={6}>
+              <Text color="white" fontSize="$2">🍃</Text>
+              <Text color="white" fontSize="$3" fontWeight="700">
+                {user.greenTokensBalance} GT
+              </Text>
+            </XStack>
+          </BlurView>
+        </View>
 
-        {/* ── Bouton QR Code ── */}
-        <GreenButton
-          onPress={() =>
-            Alert.alert(
-              '🎫 QR Code',
-              'Votre QR Code personnel sera généré ici.\nFonctionnalité en cours de développement.',
-              [{ text: 'OK', style: 'default' }]
-            )
-          }
-        >
-          🎫 Générer mon QR Code
-        </GreenButton>
+        {/* Region label */}
+        <View style={{ position: 'absolute', bottom: 20, left: 18 }}>
+          <Text color={INK_LIGHT} fontSize="$1" fontWeight="600" style={{ letterSpacing: 1 }}>
+            JUNGFRAU REGION · SWITZERLAND
+          </Text>
+        </View>
+      </View>
 
-        <Separator />
+      {/* ── Scrollable content ── */}
+      <ScrollView>
+        <YStack padding="$4" gap="$4" paddingBottom="$8">
 
-        {/* ── Liste des offres ── */}
-        <YStack gap="$3">
-          <H2 fontSize="$6">Offres disponibles</H2>
+          {/* Section header */}
+          <XStack justifyContent="space-between" style={{ alignItems: 'baseline' }}>
+            <H2 fontSize="$6" color={INK}>Available Offers</H2>
+            {offers !== undefined && (
+              <Text fontSize="$2" color={TEAL} fontWeight="600">
+                {offers.length} offer{offers.length !== 1 ? 's' : ''}
+              </Text>
+            )}
+          </XStack>
 
+          {/* Offer list */}
           {offers === undefined ? (
             <YStack style={{ alignItems: 'center' }} padding="$4">
-              <Spinner color={GREEN_MID} />
+              <Spinner color={TEAL} />
             </YStack>
           ) : offers.length === 0 ? (
-            <Text color="$gray10">Aucune offre disponible pour le moment.</Text>
+            <YStack gap="$3" style={{ alignItems: 'center' }} paddingVertical="$4">
+              <Text color={INK_LIGHT}>No offers available at the moment.</Text>
+              <Button size="$3" backgroundColor={TEAL} borderRadius="$4" onPress={() => void resetOffers({})}>
+                <Text color="white" fontWeight="600" fontSize="$2">Load offers</Text>
+              </Button>
+            </YStack>
           ) : (
-            offers.map((offer) => (
-              <Card
-                key={offer._id}
-                elevation={1}
-                borderWidth={1}
-                borderColor="$color4"
-                borderRadius="$5"
-              >
-                <XStack padding="$4" gap="$4" style={{ alignItems: 'center' }}>
-                  {/* Infos de l'offre */}
-                  <YStack flex={1} gap="$1">
-                    <Text fontWeight="700" fontSize="$4">
-                      {offer.title}
-                    </Text>
-                    <Paragraph color="$gray10" fontSize="$3">
-                      {offer.description}
-                    </Paragraph>
-                    {offer.originalPriceCHF != null && (
-                      <Text fontSize="$2" color="$gray9" fontWeight="500">
-                        Prix original : {offer.originalPriceCHF} CHF
-                      </Text>
-                    )}
-                    {offer.discountPercentage != null && offer.discountPercentage > 0 && offer.discountPercentage < 100 && (
-                      <Text fontSize="$2" color={GREEN_ACCENT} fontWeight="600">
-                        −{offer.discountPercentage}% de réduction
-                      </Text>
-                    )}
-                    {offer.discountPercentage === 100 && (
-                      <Text fontSize="$2" color={GREEN_ACCENT} fontWeight="600">
-                        Offert avec vos tokens 🎁
-                      </Text>
-                    )}
-                  </YStack>
-
-                  {/* Badge coût tokens */}
-                  <YStack
-                    backgroundColor={GREEN_LIGHT}
-                    borderRadius="$4"
-                    padding="$3"
-                    style={{ alignItems: 'center', minWidth: 72 }}
-                  >
-                    <Text fontWeight="900" color={GREEN_DARK} fontSize="$6">
-                      {offer.tokenCost}
-                    </Text>
-                    <Text fontSize="$1" color={GREEN_ACCENT} fontWeight="600">
-                      tokens
-                    </Text>
-                  </YStack>
-                </XStack>
-
-                {/* Bouton Réserver */}
-                <YStack paddingHorizontal="$4" paddingBottom="$4">
-                  <Button
-                    backgroundColor={GREEN_MID}
-                    borderRadius="$4"
-                    onPress={() =>
-                      router.push({
-                        pathname: '/book-offer',
-                        params: { offerId: offer._id },
-                      })
-                    }
-                  >
-                    <Text color="white" fontWeight="bold" fontSize="$4">
-                      Réserver
-                    </Text>
-                  </Button>
-                </YStack>
-              </Card>
-            ))
+            <YStack gap="$3">
+              {offers.map((offer) => (
+                <OfferRow
+                  key={offer._id}
+                  offer={offer}
+                  onBook={() =>
+                    router.push({ pathname: '/book-offer', params: { offerId: offer._id } })
+                  }
+                />
+              ))}
+            </YStack>
           )}
         </YStack>
-      </YStack>
-    </ScrollView>
+      </ScrollView>
+    </YStack>
+  )
+}
+
+type OfferRowProps = {
+  offer: {
+    title: string
+    description: string
+    tokenCost: number
+    imageUrl?: string | null
+    originalPriceCHF?: number | null
+    discountPercentage?: number | null
+  }
+  onBook: () => void
+}
+
+function OfferRow({ offer, onBook }: OfferRowProps) {
+  const imgUri = offer.imageUrl || FALLBACK_URI
+
+  return (
+    <View style={{
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: 'rgba(26,22,18,0.07)',
+      backgroundColor: 'white',
+      overflow: 'hidden',
+      shadowColor: '#000',
+      shadowOpacity: 0.05,
+      shadowRadius: 4,
+      shadowOffset: { width: 0, height: 2 },
+    }}>
+      <View style={{ flexDirection: 'row' }}>
+        {/* Square thumbnail */}
+        <Image
+          source={{ uri: imgUri }}
+          style={{ width: 90, height: 110 }}
+          resizeMode="cover"
+        />
+
+        {/* Content */}
+        <YStack flex={1} padding="$3" gap="$2" justifyContent="space-between">
+          <YStack gap="$1">
+            <Text fontWeight="700" fontSize="$4" color={INK} numberOfLines={1}>
+              {offer.title}
+            </Text>
+            <Text fontSize="$2" color={INK_LIGHT} numberOfLines={2}>
+              {offer.description}
+            </Text>
+            {offer.originalPriceCHF != null && (
+              <Text fontSize="$1" color={INK_LIGHT}>
+                Original: {offer.originalPriceCHF} CHF
+              </Text>
+            )}
+            {offer.discountPercentage != null && offer.discountPercentage > 0 && (
+              <Text fontSize="$1" color={TEAL} fontWeight="600">
+                −{offer.discountPercentage}% discount
+              </Text>
+            )}
+          </YStack>
+
+          <XStack justifyContent="space-between" style={{ alignItems: 'center' }}>
+            {/* Token cost badge */}
+            <YStack
+              backgroundColor={TEAL_BG}
+              borderRadius="$2"
+              paddingHorizontal="$2"
+              paddingVertical="$1"
+              borderWidth={1}
+              borderColor={TEAL_BRD}
+              style={{ alignItems: 'center' }}
+            >
+              <Text fontSize="$2" fontWeight="700" color={TEAL}>
+                {offer.tokenCost} GT
+              </Text>
+              <Text fontSize="$1" color={INK_LIGHT}>
+                {(offer.tokenCost - 0.01).toFixed(2)} CHF
+              </Text>
+            </YStack>
+
+            {/* Book button */}
+            <Button
+              size="$2"
+              backgroundColor={TEAL}
+              borderRadius="$3"
+              onPress={onBook}
+            >
+              <Text color="white" fontWeight="600" fontSize="$2">Book</Text>
+            </Button>
+          </XStack>
+        </YStack>
+      </View>
+    </View>
   )
 }

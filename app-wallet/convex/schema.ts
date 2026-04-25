@@ -7,9 +7,36 @@ export default defineSchema({
     email: v.string(),
     role: v.optional(v.union(v.literal("tourist"), v.literal("partner"), v.literal("admin"))),
     greenTokensBalance: v.number(),
+    jfBalance: v.optional(v.number()),
     passSerialNumber: v.optional(v.string()),
     isTourist: v.optional(v.boolean()),
-  }).index("by_email", ["email"]),
+    phone: v.optional(v.string()),
+    stayStart: v.optional(v.string()),
+    stayEnd: v.optional(v.string()),
+    hotelName: v.optional(v.string()),
+    referralCode: v.optional(v.string()),
+    referredBy: v.optional(v.id("users")),
+    isActivated: v.optional(v.boolean()),
+    familyPoolId: v.optional(v.id("familyPools")),
+  })
+    .index("by_email", ["email"])
+    .index("by_referral_code", ["referralCode"])
+    .index("by_family_pool", ["familyPoolId"]),
+
+  familyPools: defineTable({
+    name: v.string(),
+    ownerId: v.id("users"),
+    totalBudgetCHF: v.number(),
+    memberBudgets: v.optional(v.record(v.string(), v.number())),
+  }).index("by_ownerId", ["ownerId"]),
+
+  familyMembers: defineTable({
+    poolId: v.id("familyPools"),
+    userId: v.id("users"),
+    allocatedBudgetCHF: v.number(),
+  })
+    .index("by_pool", ["poolId"])
+    .index("by_user", ["userId"]),
 
   partners: defineTable({
     name: v.string(),
@@ -76,7 +103,7 @@ export default defineSchema({
 
   transactions: defineTable({
     userId: v.id("users"),
-    partnerId: v.id("partners"),
+    partnerId: v.optional(v.id("partners")),
     offerId: v.optional(v.id("offers")),
     timestamp: v.number(),
     tokensEarnedOrSpent: v.number(),
@@ -88,5 +115,12 @@ export default defineSchema({
     externalTicketId: v.string(),
     status: v.string(),
     purchasedAt: v.number(),
+    validDate: v.optional(v.string()),
   }).index("by_userId", ["userId"]),
+
+  payouts: defineTable({
+    partnerId: v.id("partners"),
+    amountTokens: v.number(),
+    settledAt: v.number(),
+  }).index("by_partnerId", ["partnerId"]),
 });

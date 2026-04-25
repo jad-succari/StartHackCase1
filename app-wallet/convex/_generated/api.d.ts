@@ -9,6 +9,9 @@
  */
 
 import type * as activities from "../activities.js";
+import type * as auth from "../auth.js";
+import type * as family from "../family.js";
+import type * as referral from "../referral.js";
 import type * as seed from "../seed.js";
 import type * as wallet from "../wallet.js";
 
@@ -20,6 +23,9 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   activities: typeof activities;
+  auth: typeof auth;
+  family: typeof family;
+  referral: typeof referral;
   seed: typeof seed;
   wallet: typeof wallet;
 }>;
