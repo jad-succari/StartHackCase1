@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Alert, Image, View } from 'react-native'
+import { Alert, View } from 'react-native'
 import { useMutation, useQuery } from 'convex/react'
 import QRCode from 'react-native-qrcode-svg'
 import { api } from '../../convex/_generated/api'
@@ -14,8 +14,6 @@ const BG        = '#FAF8F5'
 const RAISED    = '#F2EEE9'
 const BORDER    = 'rgba(26,22,18,0.08)'
 const RED       = '#C62828'
-
-const FALLBACK_IMG = 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=500&q=80'
 
 export default function TicketsScreen() {
   const user = useQuery(api.wallet.getUser)
@@ -128,7 +126,6 @@ function TicketCard({
   onConfirm, onCancelConfirm, onCancelDo,
 }: TicketCardProps) {
   const [showQR, setShowQR] = useState(false)
-  const imgUri = ticket.imageUrl ?? FALLBACK_IMG
 
   return (
     <YStack
@@ -146,60 +143,37 @@ function TicketCard({
         shadowOffset: { width: 0, height: 4 },
       }}
     >
-      {/* ── Photo header 140px ── */}
-      <View style={{ height: 140, position: 'relative' }}>
-        <Image
-          source={{ uri: imgUri }}
-          style={{ width: '100%', height: '100%' }}
-          resizeMode="cover"
-        />
-
-        {/* Scrim: transparent top → dark bottom */}
-        <View style={{
-          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(10,8,6,0.18)',
-        }} />
-        <View style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0, height: 90,
-          backgroundColor: 'rgba(10,8,6,0.58)',
-        }} />
-
-        {/* Status pill — top right */}
-        <View style={{
-          position: 'absolute', top: 12, right: 12,
-          backgroundColor: isValide ? 'rgba(42,143,160,0.94)' : 'rgba(26,22,18,0.75)',
-          borderRadius: 9999,
-          paddingHorizontal: 13,
-          paddingVertical: 6,
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 6,
-        }}>
-          <Text style={{ fontSize: 11, color: 'white', lineHeight: 13 }}>
-            {isValide ? '✓' : '◷'}
-          </Text>
-          <Text style={{ fontSize: 11, fontWeight: '700', color: 'white', letterSpacing: 0.8 }}>
-            {isValide ? 'VALID' : 'EXPIRED'}
-          </Text>
-        </View>
-
-        {/* Title + location — bottom left */}
-        <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 16, paddingBottom: 14 }}>
+      {/* ── Header with title ── */}
+      <View style={{ backgroundColor: isValide ? TEAL : INK_LIGHT, padding: 16, gap: 8 }}>
+        <XStack justifyContent="space-between" alignItems="center">
           <Text style={{
-            fontSize: 26, fontWeight: '600',
-            color: '#FFFFFF', lineHeight: 30,
-            textShadowColor: 'rgba(0,0,0,0.4)',
-            textShadowOffset: { width: 0, height: 1 },
-            textShadowRadius: 6,
+            fontSize: 20, fontWeight: '600',
+            color: '#FFFFFF', lineHeight: 24,
           }}>
             {ticket.offerTitle}
           </Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
-            <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)' }}>📍</Text>
-            <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', fontWeight: '500' }}>
-              Jungfrau Region
+          <View style={{
+            backgroundColor: 'rgba(255,255,255,0.2)',
+            borderRadius: 9999,
+            paddingHorizontal: 13,
+            paddingVertical: 6,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
+          }}>
+            <Text style={{ fontSize: 11, color: 'white', lineHeight: 13 }}>
+              {isValide ? '✓' : '◷'}
+            </Text>
+            <Text style={{ fontSize: 11, fontWeight: '700', color: 'white', letterSpacing: 0.8 }}>
+              {isValide ? 'VALID' : 'EXPIRED'}
             </Text>
           </View>
+        </XStack>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+          <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)' }}>📍</Text>
+          <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', fontWeight: '500' }}>
+            Jungfrau Region
+          </Text>
         </View>
       </View>
 

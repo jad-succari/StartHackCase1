@@ -146,7 +146,7 @@ export default function BookOfferScreen() {
                     <Text style={{ fontFamily: 'Georgia', fontSize: 16, color: 'rgba(201,168,76,0.5)' }}> GT</Text>
                   </XStack>
                   <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
-                    {(cost - 0.01).toFixed(2)} CHF
+                    {cost.toFixed(2)} CHF
                   </Text>
                 </YStack>
               </XStack>
@@ -242,7 +242,7 @@ export default function BookOfferScreen() {
                 <Text style={{ fontSize: 10, fontWeight: '600', color: INK_LIGHT, letterSpacing: 1, textTransform: 'uppercase' }}>
                   Your balance
                 </Text>
-                <Text style={{ fontSize: 14, color: INK_MID }}>{balance} GT · {(balance - 0.01).toFixed(2)} CHF</Text>
+                <Text style={{ fontSize: 14, color: INK_MID }}>{balance} GT · {balance.toFixed(2)} CHF</Text>
               </YStack>
               <YStack style={{ alignItems: 'flex-end' }} gap={2}>
                 <Text style={{ fontSize: 14, fontWeight: '700', color: canAfford ? TEAL : RED }}>

@@ -11,7 +11,18 @@ export const getUser = query({
 export const getOffers = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("offers").collect();
+    const offers = await ctx.db.query("offers").collect()
+    return await Promise.all(
+      offers.map(async (offer) => {
+        const partner = await ctx.db.get(offer.partnerId)
+        return {
+          ...offer,
+          partnerName: partner?.name ?? '',
+          partnerType: partner?.type ?? '',
+          partnerVillage: partner?.village ?? '',
+        }
+      })
+    )
   },
 });
 
@@ -312,5 +323,51 @@ export const earnTokens = mutation({
       timestamp: Date.now(),
       tokensEarnedOrSpent: amount,
     });
+  },
+});
+
+export const getBadges = query({
+  args: { userId: v.id("users") },
+  handler: async (ctx, { userId }) => {
+    const [tickets, transactions, user] = await Promise.all([
+      ctx.db.query("tickets").withIndex("by_userId", (q) => q.eq("userId", userId)).collect(),
+      ctx.db.query("transactions").withIndex("by_userId", (q) => q.eq("userId", userId)).collect(),
+      ctx.db.get(userId),
+    ]);
+
+    const enriched = await Promise.all(
+      tickets.map(async (t) => {
+        const offer = await ctx.db.get(t.offerId);
+        const partner = offer ? await ctx.db.get(offer.partnerId) : null;
+        return {
+          ...t,
+          partnerType: partner?.type ?? "",
+          isEcoCertified: partner?.isEcoCertified ?? false,
+        };
+      })
+    );
+
+    const count = enriched.length;
+    const totalSpent = transactions
+      .filter((t) => t.tokensEarnedOrSpent < 0)
+      .reduce((sum, t) => sum + Math.abs(t.tokensEarnedOrSpent), 0);
+
+    const types = new Set(enriched.map((t) => t.partnerType));
+    const balance = user?.greenTokensBalance ?? 0;
+
+    return [
+      { id: "first", emoji: "🎫", title: "First Adventure", desc: "Book your first offer", unlocked: count >= 1 },
+      { id: "ski", emoji: "🎿", title: "Ski Enthusiast", desc: "Book a ski offer", unlocked: enriched.some((t) => t.partnerType === "ski") },
+      { id: "eco", emoji: "🌱", title: "Eco Pioneer", desc: "Book an eco-certified activity", unlocked: enriched.some((t) => t.isEcoCertified) },
+      { id: "restaurant", emoji: "🍽️", title: "Gourmet Explorer", desc: "Book a restaurant experience", unlocked: enriched.some((t) => t.partnerType === "restaurant") },
+      { id: "transport", emoji: "🚠", title: "Transport Hero", desc: "Book a transport offer", unlocked: enriched.some((t) => t.partnerType === "transport") },
+      { id: "blazer", emoji: "🥾", title: "Trail Blazer", desc: "Book 3 offers", unlocked: count >= 3 },
+      { id: "collector", emoji: "🎯", title: "Collector", desc: "Book 5 offers", unlocked: count >= 5 },
+      { id: "legend", emoji: "🌟", title: "Jungfrau Legend", desc: "Book 10 offers", unlocked: count >= 10 },
+      { id: "spender", emoji: "💸", title: "Big Spender", desc: "Spend 100 GT", unlocked: totalSpent >= 100 },
+      { id: "summit", emoji: "🏔️", title: "Summit Chaser", desc: "Spend 500 GT total", unlocked: totalSpent >= 500 },
+      { id: "vip", emoji: "💎", title: "VIP", desc: "Hold 200+ GT in your wallet", unlocked: balance >= 200 },
+      { id: "explorer", emoji: "🏆", title: "True Explorer", desc: "Book offers in 3 different categories", unlocked: types.size >= 3 },
+    ];
   },
 });

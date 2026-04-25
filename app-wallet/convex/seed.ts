@@ -1,5 +1,7 @@
 import { mutation } from "./_generated/server";
 
+const ALPINE_IMAGE = "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=400&q=80";
+
 export const resetOffers = mutation({
   args: {},
   handler: async (ctx) => {
@@ -24,7 +26,7 @@ export const resetOffers = mutation({
       description: "Billet aller-retour offert pour le Sommet de l'Europe",
       tokenCost: 80,
       isActive: true,
-      imageUrl: "https://picsum.photos/seed/jungfrau/800/600",
+      imageUrl: ALPINE_IMAGE,
     });
 
     await ctx.db.insert("offers", {
@@ -33,7 +35,7 @@ export const resetOffers = mutation({
       description: "Réduction sur votre fondue traditionnelle suisse",
       tokenCost: 20,
       isActive: true,
-      imageUrl: "https://picsum.photos/seed/fondue/800/600",
+      imageUrl: ALPINE_IMAGE,
     });
 
     await ctx.db.insert("offers", {
@@ -42,7 +44,7 @@ export const resetOffers = mutation({
       description: "Voyagez à moitié prix sur tout le réseau Jungfrau",
       tokenCost: 40,
       isActive: true,
-      imageUrl: "https://picsum.photos/seed/grindelwald/800/600",
+      imageUrl: ALPINE_IMAGE,
     });
 
     return { message: "Offers reset successfully" };
@@ -155,6 +157,7 @@ export const populateData = mutation({
       description: "Round-trip train ticket to the Top of Europe at 3,454 m. Panoramic view of the Aletsch Glacier.",
       tokenCost: 180,
       originalPriceCHF: 232,
+      imageUrl: ALPINE_IMAGE,
       isActive: true,
       discountPercentage: 22,
     });
@@ -165,6 +168,7 @@ export const populateData = mutation({
       description: "Cable car to the Two Lakes Bridge terrace at 1,322 m. 360° view over Interlaken and the Alps.",
       tokenCost: 35,
       originalPriceCHF: 44,
+      imageUrl: ALPINE_IMAGE,
       isActive: true,
       discountPercentage: 20,
     });
@@ -175,6 +179,7 @@ export const populateData = mutation({
       description: "Unlimited access to Grindelwald–Wengen lifts across 213 km of slopes.",
       tokenCost: 75,
       originalPriceCHF: 95,
+      imageUrl: ALPINE_IMAGE,
       isActive: true,
       discountPercentage: 21,
     });
@@ -185,6 +190,7 @@ export const populateData = mutation({
       description: "Guided excursion through the valley of 72 waterfalls by panoramic train.",
       tokenCost: 45,
       originalPriceCHF: 58,
+      imageUrl: ALPINE_IMAGE,
       isActive: true,
       discountPercentage: 22,
     });
@@ -195,6 +201,7 @@ export const populateData = mutation({
       description: "Certified guide-led hike on the Grindelwald glacier. Equipment included.",
       tokenCost: 60,
       originalPriceCHF: 77,
+      imageUrl: ALPINE_IMAGE,
       isActive: true,
       discountPercentage: 22,
     });

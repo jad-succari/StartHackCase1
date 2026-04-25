@@ -3,6 +3,7 @@ import { BlurView } from 'expo-blur'
 import { useMutation, useQuery } from 'convex/react'
 import { Redirect, router } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useState } from 'react'
 import { api } from '../../convex/_generated/api'
 import { getRole } from '../../lib/roleStore'
 import {
@@ -16,7 +17,6 @@ import {
   YStack,
 } from 'tamagui'
 
-// EtherLaken palette
 const TEAL      = '#2A8FA0'
 const TEAL_BG   = 'rgba(42,143,160,0.09)'
 const TEAL_BRD  = 'rgba(42,143,160,0.22)'
@@ -24,15 +24,23 @@ const INK       = '#1A1612'
 const INK_LIGHT = '#A89E92'
 const BG        = '#FAF8F5'
 
-const HERO_URI    = 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&q=80'
-const FALLBACK_URI = 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&q=80'
+const HERO_URI = 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&q=80'
 
-export default function WalletScreen() {
+const CATEGORY_OPTIONS = [
+  { label: 'All', value: 'all' },
+  { label: 'Ski', value: 'ski' },
+  { label: 'Restaurant', value: 'restaurant' },
+  { label: 'Transport', value: 'transport' },
+  { label: 'Activity', value: 'activity' },
+]
+
+export default function DiscoverScreen() {
   const { top } = useSafeAreaInsets()
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+
   const user = useQuery(api.wallet.getUser)
   const offers = useQuery(api.wallet.getOffers)
   const populateData = useMutation(api.seed.populateData)
-  const resetOffers = useMutation(api.seed.resetOffers)
 
   if (getRole() === 'partner') return <Redirect href="/(tabs)/scanner" />
 
@@ -62,6 +70,13 @@ export default function WalletScreen() {
     )
   }
 
+  // Filter offers by category
+  const filteredOffers = offers === undefined
+    ? undefined
+    : selectedCategory === 'all'
+    ? offers
+    : offers.filter(o => (o as any).partnerType === selectedCategory)
+
   return (
     <YStack style={{ flex: 1 }} backgroundColor={BG}>
 
@@ -72,18 +87,15 @@ export default function WalletScreen() {
           style={{ position: 'absolute', width: '100%', height: '100%' }}
           resizeMode="cover"
         />
-        {/* Dark scrim at top for pill readability */}
         <View style={{
           position: 'absolute', top: 0, left: 0, right: 0, height: 110,
           backgroundColor: 'rgba(0,0,0,0.32)',
         }} />
 
-        {/* Glass pills row */}
         <View style={{
           position: 'absolute', top: top + 8, left: 16, right: 16,
           flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
         }}>
-          {/* "Hi, [Name]" pill */}
           <BlurView
             intensity={55}
             tint="dark"
@@ -100,7 +112,6 @@ export default function WalletScreen() {
             </XStack>
           </BlurView>
 
-          {/* GT balance pill */}
           <BlurView
             intensity={60}
             tint="dark"
@@ -119,43 +130,55 @@ export default function WalletScreen() {
           </BlurView>
         </View>
 
-        {/* Region label */}
         <View style={{ position: 'absolute', bottom: 20, left: 18 }}>
-          <Text color={INK_LIGHT} fontSize="$1" fontWeight="600" style={{ letterSpacing: 1 }}>
+          <Text color={INK_LIGHT} fontSize={16} fontWeight="600" style={{ letterSpacing: 1 }}>
             JUNGFRAU REGION · SWITZERLAND
           </Text>
         </View>
       </View>
 
       {/* ── Scrollable content ── */}
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <YStack padding="$4" gap="$4" paddingBottom="$8">
+
+          {/* Category Filter Pills */}
+          {offers !== undefined && offers.length > 0 && (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -16 }}>
+              <XStack paddingHorizontal="$4" gap="$2">
+                {CATEGORY_OPTIONS.map((cat) => (
+                  <CategoryPill
+                    key={cat.value}
+                    label={cat.label}
+                    isActive={selectedCategory === cat.value}
+                    onPress={() => setSelectedCategory(cat.value)}
+                  />
+                ))}
+              </XStack>
+            </ScrollView>
+          )}
 
           {/* Section header */}
           <XStack justifyContent="space-between" style={{ alignItems: 'baseline' }}>
             <H2 fontSize="$6" color={INK}>Available Offers</H2>
-            {offers !== undefined && (
-              <Text fontSize="$2" color={TEAL} fontWeight="600">
-                {offers.length} offer{offers.length !== 1 ? 's' : ''}
+            {filteredOffers !== undefined && (
+              <Text fontSize={16} color={TEAL} fontWeight="600">
+                {filteredOffers.length} offer{filteredOffers.length !== 1 ? 's' : ''}
               </Text>
             )}
           </XStack>
 
           {/* Offer list */}
-          {offers === undefined ? (
+          {filteredOffers === undefined ? (
             <YStack style={{ alignItems: 'center' }} padding="$4">
               <Spinner color={TEAL} />
             </YStack>
-          ) : offers.length === 0 ? (
+          ) : filteredOffers.length === 0 ? (
             <YStack gap="$3" style={{ alignItems: 'center' }} paddingVertical="$4">
-              <Text color={INK_LIGHT}>No offers available at the moment.</Text>
-              <Button size="$3" backgroundColor={TEAL} borderRadius="$4" onPress={() => void resetOffers({})}>
-                <Text color="white" fontWeight="600" fontSize="$2">Load offers</Text>
-              </Button>
+              <Text color={INK_LIGHT}>No offers available in this category.</Text>
             </YStack>
           ) : (
             <YStack gap="$3">
-              {offers.map((offer) => (
+              {filteredOffers.map((offer) => (
                 <OfferRow
                   key={offer._id}
                   offer={offer}
@@ -172,21 +195,45 @@ export default function WalletScreen() {
   )
 }
 
+type CategoryPillProps = {
+  label: string
+  isActive: boolean
+  onPress: () => void
+}
+
+function CategoryPill({ label, isActive, onPress }: CategoryPillProps) {
+  return (
+    <Button
+      size="$3"
+      backgroundColor={isActive ? TEAL : 'white'}
+      borderRadius="$4"
+      borderWidth={1}
+      borderColor={isActive ? TEAL : TEAL_BRD}
+      onPress={onPress}
+      paddingHorizontal="$4"
+    >
+      <Text color={isActive ? 'white' : INK} fontWeight="600" fontSize={13}>
+        {label}
+      </Text>
+    </Button>
+  )
+}
+
 type OfferRowProps = {
   offer: {
+    _id: string
     title: string
     description: string
     tokenCost: number
-    imageUrl?: string | null
     originalPriceCHF?: number | null
     discountPercentage?: number | null
+    partnerName?: string
+    partnerVillage?: string
   }
   onBook: () => void
 }
 
 function OfferRow({ offer, onBook }: OfferRowProps) {
-  const imgUri = offer.imageUrl || FALLBACK_URI
-
   return (
     <View style={{
       borderRadius: 16,
@@ -194,71 +241,66 @@ function OfferRow({ offer, onBook }: OfferRowProps) {
       borderColor: 'rgba(26,22,18,0.07)',
       backgroundColor: 'white',
       overflow: 'hidden',
+      padding: 14,
       shadowColor: '#000',
       shadowOpacity: 0.05,
       shadowRadius: 4,
       shadowOffset: { width: 0, height: 2 },
     }}>
-      <View style={{ flexDirection: 'row' }}>
-        {/* Square thumbnail */}
-        <Image
-          source={{ uri: imgUri }}
-          style={{ width: 90, height: 110 }}
-          resizeMode="cover"
-        />
+      <YStack gap="$2">
+        {/* Partner name */}
+        <Text fontSize={12} color={INK_LIGHT} fontWeight="600" style={{ textTransform: 'uppercase' }}>
+          {offer.partnerName || 'Partner'}
+        </Text>
 
-        {/* Content */}
-        <YStack flex={1} padding="$3" gap="$2" justifyContent="space-between">
-          <YStack gap="$1">
-            <Text fontWeight="700" fontSize="$4" color={INK} numberOfLines={1}>
-              {offer.title}
+        {/* Title */}
+        <Text fontWeight="700" fontSize={17} color={INK} numberOfLines={2}>
+          {offer.title}
+        </Text>
+
+        {/* Description */}
+        <Text fontSize={14} color={INK_LIGHT} numberOfLines={2}>
+          {offer.description}
+        </Text>
+
+        {/* Location */}
+        {offer.partnerVillage && (
+          <Text fontSize={13} color={TEAL} fontWeight="500">
+            📍 {offer.partnerVillage}
+          </Text>
+        )}
+
+        {/* Pricing row */}
+        <XStack gap="$2" alignItems="center" marginTop="$2">
+          {offer.originalPriceCHF != null && (
+            <Text fontSize={13} color={INK_LIGHT} style={{ textDecorationLine: 'line-through' }}>
+              {offer.originalPriceCHF} CHF
             </Text>
-            <Text fontSize="$2" color={INK_LIGHT} numberOfLines={2}>
-              {offer.description}
+          )}
+          <Text fontSize={14} fontWeight="700" color={TEAL}>
+            {offer.tokenCost} GT
+          </Text>
+        </XStack>
+
+        {/* Discount + Book button row */}
+        <XStack justifyContent="space-between" alignItems="center" marginTop="$2" gap="$2">
+          {offer.discountPercentage != null && offer.discountPercentage > 0 && (
+            <Text fontSize={14} fontWeight="700" color={TEAL}>
+              −{offer.discountPercentage}%
             </Text>
-            {offer.originalPriceCHF != null && (
-              <Text fontSize="$1" color={INK_LIGHT}>
-                Original: {offer.originalPriceCHF} CHF
-              </Text>
-            )}
-            {offer.discountPercentage != null && offer.discountPercentage > 0 && (
-              <Text fontSize="$1" color={TEAL} fontWeight="600">
-                −{offer.discountPercentage}% discount
-              </Text>
-            )}
-          </YStack>
-
-          <XStack justifyContent="space-between" style={{ alignItems: 'center' }}>
-            {/* Token cost badge */}
-            <YStack
-              backgroundColor={TEAL_BG}
-              borderRadius="$2"
-              paddingHorizontal="$2"
-              paddingVertical="$1"
-              borderWidth={1}
-              borderColor={TEAL_BRD}
-              style={{ alignItems: 'center' }}
-            >
-              <Text fontSize="$2" fontWeight="700" color={TEAL}>
-                {offer.tokenCost} GT
-              </Text>
-              <Text fontSize="$1" color={INK_LIGHT}>
-                {(offer.tokenCost - 0.01).toFixed(2)} CHF
-              </Text>
-            </YStack>
-
-            {/* Book button */}
-            <Button
-              size="$2"
-              backgroundColor={TEAL}
-              borderRadius="$3"
-              onPress={onBook}
-            >
-              <Text color="white" fontWeight="600" fontSize="$2">Book</Text>
-            </Button>
-          </XStack>
-        </YStack>
-      </View>
+          )}
+          <Button
+            size="$4"
+            backgroundColor={TEAL}
+            borderRadius="$4"
+            onPress={onBook}
+            flex={1}
+            paddingHorizontal="$5"
+          >
+            <Text color="white" fontWeight="700" fontSize={14}>Book now</Text>
+          </Button>
+        </XStack>
+      </YStack>
     </View>
   )
 }

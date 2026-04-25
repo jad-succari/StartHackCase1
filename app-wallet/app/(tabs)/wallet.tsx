@@ -233,7 +233,7 @@ export default function WalletScreen() {
               textTransform: 'uppercase',
             }}
           >
-            Transactions récentes
+            Recent Transactions
           </Text>
 
           {transactions === undefined ? (
@@ -242,7 +242,7 @@ export default function WalletScreen() {
             </YStack>
           ) : transactions.length === 0 ? (
             <Text color={INK_LIGHT} fontSize="$4" style={{ textAlign: 'center', paddingVertical: 24 }}>
-              Aucune transaction
+              No transactions yet
             </Text>
           ) : (
             <YStack
@@ -254,7 +254,7 @@ export default function WalletScreen() {
             >
               {transactions.map((tx, i) => {
                 const isEarned = tx.tokensEarnedOrSpent > 0
-                const date = new Date(tx.timestamp).toLocaleDateString('fr-CH', {
+                const date = new Date(tx.timestamp).toLocaleDateString('en-GB', {
                   day: 'numeric',
                   month: 'short',
                 })
@@ -358,7 +358,7 @@ function StatPill({ icon, value, label, teal, gold }: {
     >
       {icon}
       <Text
-        fontSize="$2"
+        fontSize={14}
         fontWeight="600"
         color={gold ? GOLD : teal ? TEAL : INK}
         numberOfLines={1}
@@ -366,7 +366,7 @@ function StatPill({ icon, value, label, teal, gold }: {
         {value}
       </Text>
       {label && (
-        <Text fontSize="$2" color={INK_LIGHT} numberOfLines={1}>
+        <Text fontSize={14} color={INK_LIGHT} numberOfLines={1}>
           {label}
         </Text>
       )}
