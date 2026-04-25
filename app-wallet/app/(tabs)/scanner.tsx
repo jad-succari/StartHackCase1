@@ -119,10 +119,10 @@ export default function ScannerScreen() {
           style={{ backgroundColor: 'rgba(10,8,6,0.72)', paddingTop: 60, paddingBottom: 16, paddingHorizontal: 20, alignItems: 'center', gap: 2 }}
         >
           <Text style={{ fontFamily: 'Georgia', fontSize: 22, fontWeight: '400', color: 'white' }}>
-            Scan a ticket
+            Valider un avantage
           </Text>
           <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', letterSpacing: 1, textTransform: 'uppercase' }}>
-            Partner mode
+            Mode Partenaire · EtherLaken
           </Text>
         </YStack>
 
@@ -140,7 +140,7 @@ export default function ScannerScreen() {
               paddingVertical: 8,
             }}>
               <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>
-                Align QR code within the frame
+                Alignez le QR code dans le cadre · Usage unique
               </Text>
             </View>
           )}
@@ -154,7 +154,7 @@ export default function ScannerScreen() {
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: TEAL }} />
               <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.8)' }}>
-                Scanning…
+                Prêt à scanner…
               </Text>
             </View>
           )}
@@ -172,28 +172,52 @@ export default function ScannerScreen() {
             <YStack style={{ alignItems: 'center' }} gap="$2">
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                 <View style={{
-                  width: 28, height: 28,
-                  borderRadius: 14,
+                  width: 32, height: 32,
+                  borderRadius: 16,
                   backgroundColor: banner.success ? TEAL : RED,
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}>
-                  <Text style={{ fontSize: 14, color: 'white', fontWeight: '700', lineHeight: 16 }}>
+                  <Text style={{ fontSize: 16, color: 'white', fontWeight: '700', lineHeight: 18 }}>
                     {banner.success ? '✓' : '✕'}
                   </Text>
                 </View>
                 <Text style={{
-                  fontSize: 15,
+                  fontSize: 16,
                   fontWeight: '700',
                   color: banner.success ? TEAL : RED,
                   letterSpacing: 0.3,
                 }}>
-                  {banner.success ? 'Validation successful' : 'Invalid ticket'}
+                  {banner.success ? 'Avantage validé ✓' : 'Billet invalide'}
                 </Text>
               </View>
               <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', textAlign: 'center' }}>
                 {banner.message}
               </Text>
+              {banner.success && (
+                <View style={{
+                  flexDirection: 'row',
+                  gap: 12,
+                  marginTop: 4,
+                  backgroundColor: 'rgba(42,143,160,0.15)',
+                  borderRadius: 10,
+                  borderWidth: 1,
+                  borderColor: 'rgba(42,143,160,0.3)',
+                  paddingHorizontal: 16,
+                  paddingVertical: 8,
+                }}>
+                  {[
+                    { label: 'Ancrage', value: '1 LAKE = 1 CHF' },
+                    { label: 'Règlement', value: 'Mensuel auto' },
+                    { label: 'Frais', value: '0%' },
+                  ].map((item, i) => (
+                    <View key={i} style={{ alignItems: 'center' }}>
+                      <Text style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', letterSpacing: 1, textTransform: 'uppercase' }}>{item.label}</Text>
+                      <Text style={{ fontSize: 12, fontWeight: '700', color: TEAL, marginTop: 1 }}>{item.value}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
             </YStack>
           )}
         </YStack>

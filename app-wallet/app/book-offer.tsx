@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { TouchableOpacity } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '../convex/_generated/api'
@@ -90,7 +90,7 @@ export default function BookOfferScreen() {
           </TouchableOpacity>
         )}
         <Text style={{ fontFamily: 'Georgia', fontSize: 28, fontWeight: '400', color: 'white', letterSpacing: -0.5 }}>
-          Book an offer
+          Réserver une offre
         </Text>
         <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>
           Solde : {balance} LAKE disponibles
@@ -118,7 +118,7 @@ export default function BookOfferScreen() {
             >
               <YStack padding="$4" gap="$2">
                 <Text style={{ fontSize: 11, fontWeight: '600', color: INK_LIGHT, letterSpacing: 1.5, textTransform: 'uppercase' }}>
-                  Selected offer
+                  Offre sélectionnée
                 </Text>
                 <Text style={{ fontSize: 20, fontWeight: '700', color: INK, lineHeight: 26 }}>
                   {offer.title}
@@ -126,6 +126,37 @@ export default function BookOfferScreen() {
                 {offer.description ? (
                   <Text style={{ fontSize: 13, color: INK_MID, lineHeight: 20 }}>{offer.description}</Text>
                 ) : null}
+
+                {/* Eligibility + rules */}
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
+                  <View style={{
+                    flexDirection: 'row', alignItems: 'center', gap: 4,
+                    backgroundColor: 'rgba(13,148,136,0.07)',
+                    borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4,
+                    borderWidth: 1, borderColor: 'rgba(13,148,136,0.18)',
+                  }}>
+                    <Text style={{ fontSize: 11 }}>🪪</Text>
+                    <Text style={{ fontSize: 11, fontWeight: '600', color: TEAL }}>Membres EtherLaken</Text>
+                  </View>
+                  <View style={{
+                    flexDirection: 'row', alignItems: 'center', gap: 4,
+                    backgroundColor: 'rgba(201,168,76,0.07)',
+                    borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4,
+                    borderWidth: 1, borderColor: 'rgba(201,168,76,0.2)',
+                  }}>
+                    <Text style={{ fontSize: 11 }}>1×</Text>
+                    <Text style={{ fontSize: 11, fontWeight: '600', color: '#A07830' }}>Usage unique</Text>
+                  </View>
+                  <View style={{
+                    flexDirection: 'row', alignItems: 'center', gap: 4,
+                    backgroundColor: 'rgba(5,150,105,0.07)',
+                    borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4,
+                    borderWidth: 1, borderColor: 'rgba(5,150,105,0.18)',
+                  }}>
+                    <Text style={{ fontSize: 11 }}>⚡</Text>
+                    <Text style={{ fontSize: 11, fontWeight: '600', color: '#059669' }}>0% frais réseau</Text>
+                  </View>
+                </View>
               </YStack>
 
               <XStack
@@ -253,6 +284,24 @@ export default function BookOfferScreen() {
                 </Text>
               </YStack>
             </XStack>
+
+            {/* Fee advantage banner */}
+            <View style={{
+              flexDirection: 'row', alignItems: 'center', gap: 8,
+              backgroundColor: 'rgba(5,150,105,0.07)',
+              borderRadius: 10, padding: 10,
+              borderWidth: 1, borderColor: 'rgba(5,150,105,0.15)',
+            }}>
+              <Text style={{ fontSize: 16 }}>⚡</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 12, fontWeight: '700', color: '#059669' }}>
+                  0% frais de transaction
+                </Text>
+                <Text style={{ fontSize: 11, color: '#A89E92', marginTop: 1 }}>
+                  Économisez 3–4% vs carte bancaire étrangère · Gnosis Chain
+                </Text>
+              </View>
+            </View>
 
             {/* Insufficient balance warning */}
             {!canAfford && (

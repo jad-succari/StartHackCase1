@@ -144,6 +144,49 @@ export default function BuyTokensScreen() {
               )
             })}
 
+            {/* Fee advantage */}
+            <View style={{
+              backgroundColor: 'rgba(5,150,105,0.07)',
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: 'rgba(5,150,105,0.18)',
+              padding: 12,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 10,
+            }}>
+              <Text style={{ fontSize: 20 }}>⚡</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#059669' }}>0% frais de transaction</Text>
+                <Text style={{ fontSize: 11, color: INK_LIGHT, marginTop: 2 }}>
+                  Les cartes bancaires étrangères facturent 3–4% · EtherLaken passe sur Gnosis Chain à 0%
+                </Text>
+              </View>
+            </View>
+
+            {/* 1 LAKE = 1 CHF peg */}
+            <View style={{
+              backgroundColor: 'rgba(26,22,18,0.04)',
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: BORDER,
+              padding: 12,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+              {[
+                { label: 'Ancrage', value: '1 LAKE = 1 CHF' },
+                { label: 'Réseau', value: 'Gnosis Chain' },
+                { label: 'Standard', value: 'ERC-20' },
+              ].map((item, i) => (
+                <View key={i} style={{ alignItems: 'center' }}>
+                  <Text style={{ fontSize: 10, color: INK_LIGHT, letterSpacing: 1, textTransform: 'uppercase' }}>{item.label}</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: INK, marginTop: 2 }}>{item.value}</Text>
+                </View>
+              ))}
+            </View>
+
             <TouchableOpacity
               onPress={() => selectedIndex !== null && setStep('payment')}
               style={{

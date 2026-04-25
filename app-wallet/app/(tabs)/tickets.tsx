@@ -61,6 +61,7 @@ export default function TicketsScreen() {
   }
 
   const validCount = tickets.filter((t) => t.status === 'valide').length
+  const usedCount  = tickets.filter((t) => t.status === 'utilisé' || t.status === 'used').length
 
   return (
     <ScrollView backgroundColor={BG}>
@@ -72,7 +73,9 @@ export default function TicketsScreen() {
             My Tickets
           </Text>
           <Text color={INK_LIGHT} fontSize="$3">
-            {validCount} valid ticket{validCount !== 1 ? 's' : ''} · available in Wallet
+            {validCount} billet{validCount !== 1 ? 's' : ''} valide{validCount !== 1 ? 's' : ''}
+            {usedCount > 0 ? ` · ${usedCount} utilisé${usedCount !== 1 ? 's' : ''}` : ''}
+            {' · '}Usage unique QR
           </Text>
         </YStack>
 
@@ -126,6 +129,7 @@ function TicketCard({
   onConfirm, onCancelConfirm, onCancelDo,
 }: TicketCardProps) {
   const [showQR, setShowQR] = useState(false)
+  const isUsed = ticket.status === 'utilisé' || ticket.status === 'used'
 
   return (
     <YStack
@@ -144,12 +148,9 @@ function TicketCard({
       }}
     >
       {/* ── Header with title ── */}
-      <View style={{ backgroundColor: isValide ? TEAL : INK_LIGHT, padding: 16, gap: 8 }}>
+      <View style={{ backgroundColor: isUsed ? '#4B5563' : isValide ? TEAL : INK_LIGHT, padding: 16, gap: 8 }}>
         <XStack justifyContent="space-between" alignItems="center">
-          <Text style={{
-            fontSize: 20, fontWeight: '600',
-            color: '#FFFFFF', lineHeight: 24,
-          }}>
+          <Text style={{ fontSize: 20, fontWeight: '600', color: '#FFFFFF', lineHeight: 24, flex: 1, marginRight: 8 }}>
             {ticket.offerTitle}
           </Text>
           <View style={{
@@ -162,18 +163,26 @@ function TicketCard({
             gap: 6,
           }}>
             <Text style={{ fontSize: 11, color: 'white', lineHeight: 13 }}>
-              {isValide ? '✓' : '◷'}
+              {isValide ? '✓' : isUsed ? '✓' : '◷'}
             </Text>
             <Text style={{ fontSize: 11, fontWeight: '700', color: 'white', letterSpacing: 0.8 }}>
-              {isValide ? 'VALID' : 'EXPIRED'}
+              {isValide ? 'VALIDE' : isUsed ? 'UTILISÉ' : 'EXPIRÉ'}
             </Text>
           </View>
         </XStack>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-          <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)' }}>📍</Text>
-          <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', fontWeight: '500' }}>
-            Jungfrau Region
-          </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)' }}>📍</Text>
+            <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', fontWeight: '500' }}>Jungfrau Region</Text>
+          </View>
+          <View style={{
+            backgroundColor: 'rgba(255,255,255,0.15)',
+            borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2,
+          }}>
+            <Text style={{ fontSize: 10, fontWeight: '700', color: 'rgba(255,255,255,0.9)', letterSpacing: 0.5 }}>
+              1× USAGE UNIQUE
+            </Text>
+          </View>
         </View>
       </View>
 

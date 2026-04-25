@@ -147,6 +147,42 @@ export default function DiscoverScreen() {
             )}
           </XStack>
 
+          {/* ── Sustainability earning challenges ── */}
+          <RNScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -4 }}>
+            <View style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 4, paddingBottom: 4 }}>
+              {[
+                { icon: '🚂', action: 'Prenez le train', reward: '+10 LAKE', color: '#0D9488', bg: 'rgba(13,148,136,0.08)' },
+                { icon: '🌿', action: 'Activité éco-certifiée', reward: '+15 LAKE', color: '#059669', bg: 'rgba(5,150,105,0.08)' },
+                { icon: '🚶', action: 'Randonnée locale', reward: '+5 LAKE', color: '#0D9488', bg: 'rgba(13,148,136,0.08)' },
+                { icon: '♻️', action: 'Geste durable', reward: '+3 LAKE', color: '#059669', bg: 'rgba(5,150,105,0.08)' },
+              ].map((ch) => (
+                <View key={ch.action} style={{
+                  backgroundColor: ch.bg,
+                  borderRadius: 14,
+                  borderWidth: 1,
+                  borderColor: ch.color + '33',
+                  paddingHorizontal: 14,
+                  paddingVertical: 10,
+                  minWidth: 148,
+                }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                    <Text style={{ fontSize: 18 }}>{ch.icon}</Text>
+                    <View style={{
+                      backgroundColor: ch.color,
+                      borderRadius: 8,
+                      paddingHorizontal: 7,
+                      paddingVertical: 2,
+                    }}>
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: 'white' }}>{ch.reward}</Text>
+                    </View>
+                  </View>
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#1A1612' }}>{ch.action}</Text>
+                  <Text style={{ fontSize: 10, color: '#A89E92', marginTop: 2 }}>Récompense durabilité</Text>
+                </View>
+              ))}
+            </View>
+          </RNScrollView>
+
           {/* Category filter pills */}
           <RNScrollView horizontal showsHorizontalScrollIndicator={false}>
             <XStack gap={8} paddingVertical={4}>
