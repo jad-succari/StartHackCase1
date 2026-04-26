@@ -67,10 +67,10 @@ export default function BuyTokensScreen() {
           </TouchableOpacity>
         )}
         <Text style={{ fontFamily: 'Georgia', fontSize: 28, fontWeight: '400', color: GOLD, letterSpacing: -0.5 }}>
-          Acheter des LAKE
+          Buy LAKE
         </Text>
         <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>
-          Solde : {user?.greenTokensBalance ?? 0} LAKE
+          Balance: {user?.greenTokensBalance ?? 0} LAKE
         </Text>
       </YStack>
 
@@ -157,9 +157,9 @@ export default function BuyTokensScreen() {
             }}>
               <Text style={{ fontSize: 20 }}>⚡</Text>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 13, fontWeight: '700', color: '#059669' }}>0% frais de transaction</Text>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#059669' }}>0% transaction fees</Text>
                 <Text style={{ fontSize: 11, color: INK_LIGHT, marginTop: 2 }}>
-                  Les cartes bancaires étrangères facturent 3–4% · EtherLaken passe sur Gnosis Chain à 0%
+                  Foreign bank cards charge 3–4% · EtherLaken uses Gnosis Chain at 0%
                 </Text>
               </View>
             </View>
@@ -176,8 +176,8 @@ export default function BuyTokensScreen() {
               alignItems: 'center',
             }}>
               {[
-                { label: 'Ancrage', value: '1 LAKE = 1 CHF' },
-                { label: 'Réseau', value: 'Gnosis Chain' },
+                { label: 'Peg', value: '1 LAKE = 1 CHF' },
+                { label: 'Network', value: 'Gnosis Chain' },
                 { label: 'Standard', value: 'ERC-20' },
               ].map((item, i) => (
                 <View key={i} style={{ alignItems: 'center' }}>
@@ -317,7 +317,7 @@ export default function BuyTokensScreen() {
               Payment successful
             </Text>
             <Text style={{ fontSize: 15, color: INK_LIGHT, textAlign: 'center', lineHeight: 22 }}>
-              {pkg.tokens} LAKE ont été ajoutés à votre wallet.
+              {pkg.tokens} LAKE have been added to your wallet.
             </Text>
           </YStack>
           <TouchableOpacity

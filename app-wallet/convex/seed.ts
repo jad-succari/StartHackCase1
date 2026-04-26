@@ -137,23 +137,7 @@ async function runInsertLogic(ctx: any) {
 
   await ctx.db.insert("offers", {
     partnerId: jungfrauRailId,
-    title: "Grindelwald First gondola — return trip",
-    partnerName: "Jungfrau Railways",
-    category: "Transport",
-    locationName: "Grindelwald",
-    isEco: true,
-    isActive: true,
-    description: "Round-trip gondola to Grindelwald First at 2,168 m — gateway to ziplines, cliff walk and alpine hiking",
-    tokenCost: 19,
-    discountPercentage: 15,
-    originalPriceCHF: 44,
-    savingsCHF: 7,
-    imageUrl: "https://picsum.photos/seed/first1/300/200",
-  });
-
-  await ctx.db.insert("offers", {
-    partnerId: jungfrauRailId,
-    title: "First Cliff Walk & First Flyer access",
+    title: "First Cliff Walk & First Flyer zipline",
     partnerName: "Jungfrau Railways",
     category: "Activity",
     locationName: "Grindelwald",
@@ -164,7 +148,8 @@ async function runInsertLogic(ctx: any) {
     discountPercentage: 15,
     originalPriceCHF: 35,
     savingsCHF: 5,
-    imageUrl: "https://picsum.photos/seed/cliffwalk1/300/200",
+    // Dramatic suspension bridge crossing a mountain gorge
+    imageUrl: "https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=700&q=80",
   });
 
   await ctx.db.insert("offers", {
@@ -180,7 +165,8 @@ async function runInsertLogic(ctx: any) {
     discountPercentage: 30,
     originalPriceCHF: 44,
     savingsCHF: 13,
-    imageUrl: "https://picsum.photos/seed/maennlichen1/300/200",
+    // Cable car gondola cabin over snowy mountain peaks
+    imageUrl: "https://images.unsplash.com/photo-1578836537282-3171d77f8632?w=700&q=80",
   });
 
   await ctx.db.insert("offers", {
@@ -196,7 +182,8 @@ async function runInsertLogic(ctx: any) {
     discountPercentage: 17,
     originalPriceCHF: 12,
     savingsCHF: 2,
-    imageUrl: "https://picsum.photos/seed/gorge1/300/200",
+    // Turquoise glacial river flowing through narrow rocky gorge
+    imageUrl: "https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=700&q=80",
   });
 
   await ctx.db.insert("offers", {
@@ -212,7 +199,8 @@ async function runInsertLogic(ctx: any) {
     discountPercentage: 8,
     originalPriceCHF: 14,
     savingsCHF: 1,
-    imageUrl: "https://picsum.photos/seed/trummel1/300/200",
+    // Powerful waterfall cascading inside a mountain cave
+    imageUrl: "https://images.unsplash.com/photo-1532274402911-5a369e4c4bb5?w=700&q=80",
   });
 
   await ctx.db.insert("offers", {
@@ -228,12 +216,13 @@ async function runInsertLogic(ctx: any) {
     discountPercentage: 20,
     originalPriceCHF: 11,
     savingsCHF: 2,
-    imageUrl: "https://picsum.photos/seed/aareschlucht1/300/200",
+    // Deep narrow gorge with emerald green river and mossy walls
+    imageUrl: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=700&q=80",
   });
 
   await ctx.db.insert("offers", {
     partnerId: beatusId,
-    title: "St. Beatus-Höhlen — cave tour + museum",
+    title: "St. Beatus-Höhlen — stalactite cave tour",
     partnerName: "St. Beatus-Höhlen",
     category: "Activity",
     locationName: "Sundlauenen",
@@ -244,7 +233,8 @@ async function runInsertLogic(ctx: any) {
     discountPercentage: 10,
     originalPriceCHF: 20,
     savingsCHF: 2,
-    imageUrl: "https://picsum.photos/seed/beatus1/300/200",
+    // Illuminated stalactite cave with glowing rock formations
+    imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&q=80",
   });
 
   await ctx.db.insert("offers", {
@@ -260,7 +250,8 @@ async function runInsertLogic(ctx: any) {
     discountPercentage: 25,
     originalPriceCHF: 32,
     savingsCHF: 8,
-    imageUrl: "https://picsum.photos/seed/ballenberg1/300/200",
+    // Traditional Swiss wooden chalet surrounded by green Alpine meadows
+    imageUrl: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=700&q=80",
   });
 
   await ctx.db.insert("offers", {
@@ -276,7 +267,8 @@ async function runInsertLogic(ctx: any) {
     discountPercentage: 10,
     originalPriceCHF: 280,
     savingsCHF: 28,
-    imageUrl: "https://picsum.photos/seed/heli1/300/200",
+    // Helicopter flying over white Alpine glacier from above
+    imageUrl: "https://images.unsplash.com/photo-1542296332-2e4473faf563?w=700&q=80",
   });
 
   await ctx.db.insert("offers", {
@@ -292,7 +284,8 @@ async function runInsertLogic(ctx: any) {
     discountPercentage: 10,
     originalPriceCHF: 140,
     savingsCHF: 14,
-    imageUrl: "https://picsum.photos/seed/heli2/300/200",
+    // The Eiger's dramatic vertical granite north face against blue sky
+    imageUrl: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=700&q=80",
   });
 
   await ctx.db.insert("offers", {
@@ -308,12 +301,13 @@ async function runInsertLogic(ctx: any) {
     discountPercentage: 25,
     originalPriceCHF: 78,
     savingsCHF: 20,
-    imageUrl: "https://picsum.photos/seed/ski2/300/200",
+    // Skier carving through fresh powder on a sunny Alpine slope
+    imageUrl: "https://images.unsplash.com/photo-1491555103944-7c647fd857e6?w=700&q=80",
   });
 
   await ctx.db.insert("offers", {
     partnerId: schwarzwaldalpId,
-    title: "Zvieriplättli — alpine snack platter",
+    title: "Zvieriplättli — Alpine snack platter",
     partnerName: "Chalet Schwarzwaldalp",
     category: "Restaurant",
     locationName: "Meiringen",
@@ -324,7 +318,70 @@ async function runInsertLogic(ctx: any) {
     discountPercentage: 33,
     originalPriceCHF: 18,
     savingsCHF: 6,
-    imageUrl: "https://picsum.photos/seed/schwarzwaldalp1/300/200",
+    // Rustic wooden board with Swiss cheese, charcuterie and fresh bread
+    imageUrl: "https://images.unsplash.com/photo-1452195100486-9cc805987862?w=700&q=80",
+  });
+
+  // ── 5 Activities (bookable experiences with duration) ─────────────────────────
+
+  await ctx.db.insert("activities", {
+    partnerId: jungfrauRailId,
+    title: "Jungfraujoch — Top of Europe",
+    description: "Ride the highest railway in Europe to 3,454 m — walk on the Aletsch glacier, visit the Ice Palace, and see 4,000m peaks in every direction",
+    priceJF: 80,
+    originalPriceCHF: 226,
+    durationMinutes: 300,
+    // Icy blue glacier plateau at high altitude with snowy peaks
+    imageUrl: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=700&q=80",
+    isActive: true,
+  });
+
+  await ctx.db.insert("activities", {
+    partnerId: airGlaciersId,
+    title: "Tandem paragliding over Interlaken",
+    description: "Soar over the turquoise lakes and Alpine valley with a certified pilot — 20-minute flight from Beatenberg with epic panorama",
+    priceJF: 45,
+    originalPriceCHF: 130,
+    durationMinutes: 90,
+    // Colorful paraglider soaring above a green valley with lakes below
+    imageUrl: "https://images.unsplash.com/photo-1503614472-8c93d56e92ce?w=700&q=80",
+    isActive: true,
+  });
+
+  await ctx.db.insert("activities", {
+    partnerId: trümmelbachId,
+    title: "Boat cruise on Lake Brienz",
+    description: "Scenic 1.5-hour cruise on the glacier-fed turquoise waters of Lake Brienz — passing waterfalls, cliffs and charming villages",
+    priceJF: 12,
+    originalPriceCHF: 35,
+    durationMinutes: 90,
+    // Turquoise alpine lake with emerald green water and mountain reflections
+    imageUrl: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=700&q=80",
+    isActive: true,
+  });
+
+  await ctx.db.insert("activities", {
+    partnerId: maennlichenId,
+    title: "Kleine Scheidegg summit hike",
+    description: "Classic 3-hour ridge hike from Männlichen to Kleine Scheidegg with uninterrupted views of the Eiger, Mönch and Jungfrau the entire way",
+    priceJF: 10,
+    originalPriceCHF: 0,
+    durationMinutes: 180,
+    // Hiker walking on a mountain trail with dramatic snow-capped peaks behind
+    imageUrl: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=700&q=80",
+    isActive: true,
+  });
+
+  await ctx.db.insert("activities", {
+    partnerId: gletscherschluchtId,
+    title: "Lauterbrunnen Valley waterfall walk",
+    description: "Self-guided walk through the famous valley of 72 waterfalls — including Staubbach Falls and the hidden Trümmelbach cascade trails",
+    priceJF: 5,
+    originalPriceCHF: 12,
+    durationMinutes: 120,
+    // Lush green valley with towering white waterfalls cascading down sheer cliffs
+    imageUrl: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=700&q=80",
+    isActive: true,
   });
 
   // ── Demo user: Alex, 1890 GT ────────────────────────────────────────────────

@@ -7,13 +7,6 @@ import { api } from '../convex/_generated/api'
 import type { Id } from '../convex/_generated/dataModel'
 import { ScrollView, Spinner, Text, XStack, YStack } from 'tamagui'
 
-const CAT_IMAGE: Record<string, string> = {
-  Transport: 'https://images.unsplash.com/photo-1578836537282-3171d77f8632?w=700&q=80',
-  Ski:       'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=700&q=80',
-  Restaurant:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=700&q=80',
-  Activity:  'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=700&q=80',
-}
-
 const INK       = '#1A1612'
 const INK_MID   = '#6B5E52'
 const INK_LIGHT = '#A89E92'
@@ -22,6 +15,8 @@ const TEAL      = '#2A8FA0'
 const GOLD      = '#C9A84C'
 const BORDER    = 'rgba(26,22,18,0.08)'
 const RED       = '#B8362A'
+
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=700&q=80'
 
 type Step = 'confirm' | 'processing' | 'success' | 'error'
 
@@ -44,31 +39,40 @@ function formatDate(str: string): string {
   })
 }
 
-export default function BookOfferScreen() {
+function dateToTimestamp(str: string): number {
+  const [y, m, d] = str.split('-').map(Number)
+  return new Date(y, m - 1, d).getTime()
+}
+
+export default function BookActivityScreen() {
   const { top } = useSafeAreaInsets()
-  const { offerId } = useLocalSearchParams<{ offerId: string }>()
+  const { activityId } = useLocalSearchParams<{ activityId: string }>()
   const user = useQuery(api.wallet.getUser)
-  const offer = useQuery(
-    api.wallet.getOffer,
-    offerId ? { offerId: offerId as Id<'offers'> } : 'skip'
+  const activity = useQuery(
+    api.activities.getActivityById,
+    activityId ? { activityId: activityId as Id<'activities'> } : 'skip'
   )
-  const bookOffer = useMutation(api.wallet.bookOffer)
+  const bookActivity = useMutation(api.activities.bookActivity)
   const [step, setStep] = useState<Step>('confirm')
   const [validDate, setValidDate] = useState(todayStr)
 
   const handleBook = async () => {
-    if (!user || !offer) return
+    if (!user || !activity) return
     setStep('processing')
     await new Promise((r) => setTimeout(r, 2000))
     try {
-      await bookOffer({ userId: user._id, offerId: offer._id, validDate })
+      await bookActivity({
+        userId: user._id,
+        activityId: activity._id,
+        scheduledAt: dateToTimestamp(validDate),
+      })
       setStep('success')
     } catch {
       setStep('error')
     }
   }
 
-  if (user === undefined || offer === undefined) {
+  if (user === undefined || activity === undefined) {
     return (
       <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} backgroundColor={BG}>
         <Spinner size="large" color={TEAL} />
@@ -76,13 +80,17 @@ export default function BookOfferScreen() {
     )
   }
 
-  const balance = user?.greenTokensBalance ?? 0
-  const cost = offer?.tokenCost ?? 0
+  const balance   = user?.greenTokensBalance ?? 0
+  const cost      = activity?.priceJF ?? 0
   const canAfford = balance >= cost
-  const today = todayStr()
-  const isToday = validDate === today
-  const heroH = Math.max(200, top + 160)
-  const heroImage = offer?.imageUrl ?? CAT_IMAGE[offer?.category ?? 'Activity'] ?? CAT_IMAGE.Activity
+  const today     = todayStr()
+  const isToday   = validDate === today
+  const heroH     = Math.max(200, top + 160)
+  const heroImage = activity?.imageUrl ?? FALLBACK_IMAGE
+
+  const hours    = Math.floor((activity?.durationMinutes ?? 0) / 60)
+  const mins     = (activity?.durationMinutes ?? 0) % 60
+  const duration = hours > 0 ? (mins > 0 ? `${hours}h ${mins}min` : `${hours}h`) : `${mins}min`
 
   return (
     <YStack style={{ flex: 1, backgroundColor: BG }}>
@@ -94,28 +102,22 @@ export default function BookOfferScreen() {
           style={{ position: 'absolute', width: '100%', height: '100%' }}
           resizeMode="cover"
         />
-        {/* Dark overlay */}
         <View style={{
           position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
           backgroundColor: 'rgba(0,0,0,0.52)',
         }} />
-        {/* Bottom fade to BG */}
         <View style={{
           position: 'absolute', bottom: 0, left: 0, right: 0, height: 60,
           backgroundColor: BG, opacity: 0.92,
         }} />
-
-        {/* Content on top of image */}
-        <View style={{
-          position: 'absolute', top: top + 12, left: 20, right: 20, bottom: 0,
-        }}>
+        <View style={{ position: 'absolute', top: top + 12, left: 20, right: 20, bottom: 0 }}>
           {(step === 'confirm' || step === 'error') && (
             <TouchableOpacity onPress={() => router.back()} style={{ marginBottom: 10, alignSelf: 'flex-start' }}>
               <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', letterSpacing: 0.3 }}>← Back</Text>
             </TouchableOpacity>
           )}
           <Text style={{ fontFamily: 'Georgia', fontSize: 28, fontWeight: '400', color: 'white', letterSpacing: -0.5 }}>
-            Book an offer
+            Book an activity
           </Text>
           <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginTop: 3 }}>
             Balance: {balance} LAKE available
@@ -124,11 +126,11 @@ export default function BookOfferScreen() {
       </View>
 
       {/* ── Step 1: Confirmation ── */}
-      {step === 'confirm' && offer && (
+      {step === 'confirm' && activity && (
         <ScrollView>
           <YStack padding="$4" gap="$4" paddingBottom="$8">
 
-            {/* Offer card */}
+            {/* Activity card */}
             <YStack
               backgroundColor="white"
               borderRadius="$5"
@@ -136,24 +138,23 @@ export default function BookOfferScreen() {
               borderColor={BORDER}
               overflow="hidden"
               style={{
-                shadowColor: '#000',
-                shadowOpacity: 0.06,
-                shadowRadius: 12,
-                shadowOffset: { width: 0, height: 3 },
+                shadowColor: INK,
+                shadowOpacity: 0.08,
+                shadowRadius: 16,
+                shadowOffset: { width: 0, height: 4 },
               }}
             >
               <YStack padding="$4" gap="$2">
                 <Text style={{ fontSize: 11, fontWeight: '600', color: INK_LIGHT, letterSpacing: 1.5, textTransform: 'uppercase' }}>
-                  Selected offer
+                  Selected activity
                 </Text>
-                <Text style={{ fontSize: 20, fontWeight: '700', color: INK, lineHeight: 26 }}>
-                  {offer.title}
+                <Text style={{ fontFamily: 'Georgia', fontSize: 20, fontWeight: '400', color: INK, lineHeight: 26 }}>
+                  {activity.title}
                 </Text>
-                {offer.description ? (
-                  <Text style={{ fontSize: 13, color: INK_MID, lineHeight: 20 }}>{offer.description}</Text>
+                {activity.description ? (
+                  <Text style={{ fontSize: 13, color: INK_MID, lineHeight: 20 }}>{activity.description}</Text>
                 ) : null}
 
-                {/* Eligibility + rules */}
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
                   <View style={{
                     flexDirection: 'row', alignItems: 'center', gap: 4,
@@ -161,8 +162,8 @@ export default function BookOfferScreen() {
                     borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4,
                     borderWidth: 1, borderColor: 'rgba(13,148,136,0.18)',
                   }}>
-                    <Text style={{ fontSize: 11 }}>🪪</Text>
-                    <Text style={{ fontSize: 11, fontWeight: '600', color: TEAL }}>EtherLaken Members</Text>
+                    <Text style={{ fontSize: 11 }}>⏱</Text>
+                    <Text style={{ fontSize: 11, fontWeight: '600', color: TEAL }}>{duration}</Text>
                   </View>
                   <View style={{
                     flexDirection: 'row', alignItems: 'center', gap: 4,
@@ -193,7 +194,7 @@ export default function BookOfferScreen() {
                 style={{ alignItems: 'center' }}
               >
                 <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', letterSpacing: 0.5 }}>
-                  Booking cost
+                  Activity cost
                 </Text>
                 <YStack style={{ alignItems: 'flex-end' }} gap={2}>
                   <XStack style={{ alignItems: 'baseline' }} gap="$1">
@@ -202,14 +203,16 @@ export default function BookOfferScreen() {
                     </Text>
                     <Text style={{ fontFamily: 'Georgia', fontSize: 16, color: 'rgba(201,168,76,0.5)' }}> LAKE</Text>
                   </XStack>
-                  <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
-                    {cost.toFixed(2)} CHF
-                  </Text>
+                  {activity.originalPriceCHF > 0 && (
+                    <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
+                      {activity.originalPriceCHF} CHF
+                    </Text>
+                  )}
                 </YStack>
               </XStack>
             </YStack>
 
-            {/* ── Date picker ── */}
+            {/* Date picker */}
             <YStack
               backgroundColor="white"
               borderRadius="$5"
@@ -217,10 +220,10 @@ export default function BookOfferScreen() {
               borderColor={BORDER}
               overflow="hidden"
               style={{
-                shadowColor: '#000',
-                shadowOpacity: 0.04,
-                shadowRadius: 8,
-                shadowOffset: { width: 0, height: 2 },
+                shadowColor: INK,
+                shadowOpacity: 0.06,
+                shadowRadius: 12,
+                shadowOffset: { width: 0, height: 3 },
               }}
             >
               <YStack padding="$4" paddingBottom="$3" gap="$1">
@@ -228,34 +231,25 @@ export default function BookOfferScreen() {
                   Activity date
                 </Text>
                 <Text style={{ fontSize: 12, color: INK_LIGHT, lineHeight: 18 }}>
-                  Your ticket will only be valid on this day.
+                  Your booking will be scheduled for this day.
                 </Text>
               </YStack>
 
-              <XStack
-                paddingHorizontal="$4"
-                paddingBottom="$4"
-                style={{ alignItems: 'center' }}
-                gap="$3"
-              >
-                {/* Previous day */}
+              <XStack paddingHorizontal="$4" paddingBottom="$4" style={{ alignItems: 'center' }} gap="$3">
                 <TouchableOpacity
                   onPress={() => setValidDate((d) => shiftDate(d, -1))}
                   disabled={isToday}
                   style={{
-                    width: 40, height: 40,
-                    borderRadius: 20,
+                    width: 40, height: 40, borderRadius: 20,
                     borderWidth: 1,
                     borderColor: isToday ? 'rgba(26,22,18,0.06)' : BORDER,
                     backgroundColor: isToday ? 'rgba(26,22,18,0.03)' : 'white',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    alignItems: 'center', justifyContent: 'center',
                   }}
                 >
                   <Text style={{ fontSize: 18, color: isToday ? INK_LIGHT : INK, opacity: isToday ? 0.35 : 1 }}>‹</Text>
                 </TouchableOpacity>
 
-                {/* Date display */}
                 <YStack flex={1} style={{ alignItems: 'center' }} gap="$1">
                   <Text style={{ fontSize: 16, fontWeight: '700', color: INK, textAlign: 'center' }}>
                     {formatDate(validDate)}
@@ -267,17 +261,12 @@ export default function BookOfferScreen() {
                   )}
                 </YStack>
 
-                {/* Next day */}
                 <TouchableOpacity
                   onPress={() => setValidDate((d) => shiftDate(d, 1))}
                   style={{
-                    width: 40, height: 40,
-                    borderRadius: 20,
-                    borderWidth: 1,
-                    borderColor: BORDER,
-                    backgroundColor: 'white',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    width: 40, height: 40, borderRadius: 20,
+                    borderWidth: 1, borderColor: BORDER, backgroundColor: 'white',
+                    alignItems: 'center', justifyContent: 'center',
                   }}
                 >
                   <Text style={{ fontSize: 18, color: INK }}>›</Text>
@@ -299,19 +288,16 @@ export default function BookOfferScreen() {
                 <Text style={{ fontSize: 10, fontWeight: '600', color: INK_LIGHT, letterSpacing: 1, textTransform: 'uppercase' }}>
                   Your balance
                 </Text>
-                <Text style={{ fontSize: 14, color: INK_MID }}>{balance} LAKE · {balance.toFixed(2)} CHF</Text>
+                <Text style={{ fontSize: 14, color: INK_MID }}>{balance} LAKE</Text>
               </YStack>
               <YStack style={{ alignItems: 'flex-end' }} gap={2}>
                 <Text style={{ fontSize: 14, fontWeight: '700', color: canAfford ? TEAL : RED }}>
-                  {canAfford ? `−${cost} LAKE` : `${cost - balance} LAKE manquants`}
-                </Text>
-                <Text style={{ fontSize: 11, color: INK_LIGHT }}>
-                  {(cost - 0.01).toFixed(2)} CHF
+                  {canAfford ? `−${cost} LAKE` : `${cost - balance} LAKE missing`}
                 </Text>
               </YStack>
             </XStack>
 
-            {/* Fee advantage banner */}
+            {/* Fee advantage */}
             <View style={{
               flexDirection: 'row', alignItems: 'center', gap: 8,
               backgroundColor: 'rgba(5,150,105,0.07)',
@@ -320,12 +306,8 @@ export default function BookOfferScreen() {
             }}>
               <Text style={{ fontSize: 16 }}>⚡</Text>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 12, fontWeight: '700', color: '#059669' }}>
-                  0% transaction fees
-                </Text>
-                <Text style={{ fontSize: 11, color: '#A89E92', marginTop: 1 }}>
-                  Save 3–4% vs foreign bank card · Gnosis Chain
-                </Text>
+                <Text style={{ fontSize: 12, fontWeight: '700', color: '#059669' }}>0% transaction fees</Text>
+                <Text style={{ fontSize: 11, color: '#A89E92', marginTop: 1 }}>Save 3–4% vs foreign bank card · Gnosis Chain</Text>
               </View>
             </View>
 
@@ -339,11 +321,9 @@ export default function BookOfferScreen() {
                 padding="$3"
                 gap="$1"
               >
-                <Text style={{ fontSize: 13, fontWeight: '700', color: RED }}>
-                  ⚠️  Insufficient balance
-                </Text>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: RED }}>⚠️  Insufficient balance</Text>
                 <Text style={{ fontSize: 12, color: RED, opacity: 0.8 }}>
-                  You need {cost - balance} more LAKE to book this offer.
+                  You need {cost - balance} more LAKE to book this activity.
                 </Text>
               </YStack>
             )}
@@ -368,17 +348,13 @@ export default function BookOfferScreen() {
               </Text>
             </TouchableOpacity>
 
-            {/* Buy tokens link if can't afford */}
             {!canAfford && (
               <TouchableOpacity
                 onPress={() => router.push('/buy-tokens')}
                 style={{
-                  backgroundColor: 'white',
-                  borderRadius: 14,
-                  borderWidth: 1,
-                  borderColor: BORDER,
-                  paddingVertical: 14,
-                  alignItems: 'center',
+                  backgroundColor: 'white', borderRadius: 14,
+                  borderWidth: 1, borderColor: BORDER,
+                  paddingVertical: 14, alignItems: 'center',
                 }}
               >
                 <Text style={{ fontSize: 14, fontWeight: '600', color: INK }}>💳  Buy LAKE</Text>
@@ -388,7 +364,7 @@ export default function BookOfferScreen() {
         </ScrollView>
       )}
 
-      {/* ── Step 2: Processing ── */}
+      {/* Processing */}
       {step === 'processing' && (
         <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} gap="$4">
           <Spinner size="large" color={TEAL} />
@@ -397,38 +373,35 @@ export default function BookOfferScreen() {
         </YStack>
       )}
 
-      {/* ── Step 3: Success ── */}
+      {/* Success */}
       {step === 'success' && (
         <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} padding="$6" gap="$5">
           <Text style={{ fontSize: 72 }}>✅</Text>
           <YStack gap="$2" style={{ alignItems: 'center' }}>
             <Text style={{ fontFamily: 'Georgia', fontSize: 28, fontWeight: '400', color: INK, textAlign: 'center', letterSpacing: -0.5 }}>
-              Booking confirmed!
+              Activity booked!
             </Text>
             <Text style={{ fontSize: 15, color: INK_LIGHT, textAlign: 'center', lineHeight: 22 }}>
-              Valid on {formatDate(validDate)}.{'\n'}Show your ticket to the inspector.
+              Scheduled for {formatDate(validDate)}.{'\n'}Show your booking to the guide.
             </Text>
           </YStack>
           <TouchableOpacity
             onPress={() => router.push('/(tabs)/tickets')}
             style={{
-              backgroundColor: INK,
-              borderRadius: 14,
-              paddingVertical: 16,
-              paddingHorizontal: 32,
-              width: '100%',
-              alignItems: 'center',
+              backgroundColor: INK, borderRadius: 14,
+              paddingVertical: 16, paddingHorizontal: 32,
+              width: '100%', alignItems: 'center',
             }}
           >
             <Text style={{ fontSize: 15, fontWeight: '600', color: 'white' }}>View my tickets</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => router.back()} style={{ paddingVertical: 8 }}>
-            <Text style={{ fontSize: 13, color: INK_LIGHT }}>← Back to offers</Text>
+            <Text style={{ fontSize: 13, color: INK_LIGHT }}>← Back to activities</Text>
           </TouchableOpacity>
         </YStack>
       )}
 
-      {/* ── Step 4: Error ── */}
+      {/* Error */}
       {step === 'error' && (
         <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} padding="$6" gap="$5">
           <Text style={{ fontSize: 72 }}>❌</Text>
@@ -437,24 +410,21 @@ export default function BookOfferScreen() {
               Booking failed
             </Text>
             <Text style={{ fontSize: 15, color: INK_LIGHT, textAlign: 'center', lineHeight: 22 }}>
-              You don't have enough LAKE for this offer.
+              You don't have enough LAKE for this activity.
             </Text>
           </YStack>
           <TouchableOpacity
             onPress={() => router.push('/buy-tokens')}
             style={{
-              backgroundColor: INK,
-              borderRadius: 14,
-              paddingVertical: 16,
-              paddingHorizontal: 32,
-              width: '100%',
-              alignItems: 'center',
+              backgroundColor: INK, borderRadius: 14,
+              paddingVertical: 16, paddingHorizontal: 32,
+              width: '100%', alignItems: 'center',
             }}
           >
             <Text style={{ fontSize: 15, fontWeight: '600', color: 'white' }}>💳  Buy LAKE</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => router.back()} style={{ paddingVertical: 8 }}>
-            <Text style={{ fontSize: 13, color: INK_LIGHT }}>← Back to offers</Text>
+            <Text style={{ fontSize: 13, color: INK_LIGHT }}>← Back to activities</Text>
           </TouchableOpacity>
         </YStack>
       )}

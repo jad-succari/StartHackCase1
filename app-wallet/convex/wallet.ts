@@ -176,9 +176,16 @@ export const validateTicket = mutation({
     }
 
     if (ticket.validDate) {
-      const now = new Date();
-      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-      if (ticket.validDate !== today) {
+      // Accept ±2h timezone window so Paris (UTC+2) and UTC server always agree.
+      const nowUtc = Date.now()
+      const toDateStr = (offsetMs: number) => {
+        const d = new Date(nowUtc + offsetMs)
+        return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`
+      }
+      const validDates: string[] = [
+        toDateStr(-7200000), toDateStr(0), toDateStr(3600000), toDateStr(7200000),
+      ]
+      if (!validDates.includes(ticket.validDate as string)) {
         return { success: false, message: `Billet valable uniquement le ${ticket.validDate}` };
       }
     }
@@ -330,7 +337,7 @@ export const getUserTransactions = query({
           amountLAKE: tx.amountLAKE ?? Math.abs(tx.tokensEarnedOrSpent),
           type: tx.type ?? (tx.tokensEarnedOrSpent > 0 ? "earn" : "spend"),
           txHash: tx.txHash,
-          label: offer?.title ?? (tx.tokensEarnedOrSpent > 0 ? "Récompense LAKE" : "Dépense LAKE"),
+          label: offer?.title ?? (tx.tokensEarnedOrSpent > 0 ? "LAKE Reward" : "LAKE Spend"),
         };
       })
     );

@@ -57,7 +57,7 @@ export default function OnboardingScreen() {
 
   const handleCreate = async () => {
     if (!form.name.trim() || !form.email.trim()) {
-      setError('Prénom/Nom et email sont obligatoires.')
+      setError('Full name and email are required.')
       return
     }
     setError('')
@@ -116,7 +116,7 @@ export default function OnboardingScreen() {
         }, 3000)
       }, 2000)
     } catch (e: any) {
-      setError(e.message ?? 'Une erreur est survenue.')
+      setError(e.message ?? 'An error occurred.')
     } finally {
       setLoading(false)
     }
@@ -192,14 +192,14 @@ function Step1({ top, bottom, onNext }: { top: number; bottom: number; onNext: (
           fontSize: 13, color: 'rgba(255,255,255,0.4)',
           letterSpacing: 2, textTransform: 'uppercase', textAlign: 'center', marginBottom: 32,
         }}>
-          Tourisme durable · Jungfrau
+          Sustainable tourism · Jungfrau
         </Text>
 
         <Text style={{
           fontSize: 17, color: 'rgba(255,255,255,0.75)',
           textAlign: 'center', lineHeight: 26, maxWidth: 280,
         }}>
-          Gagnez des GreenTokens en choisissant des expériences locales et durables dans la région de Jungfrau.
+          Earn LAKE tokens by choosing sustainable local experiences in the Jungfrau region.
         </Text>
 
         {/* Progress dots */}
@@ -226,7 +226,7 @@ function Step1({ top, bottom, onNext }: { top: number; bottom: number; onNext: (
           }}
         >
           <Text style={{ color: WHITE, fontWeight: '700', fontSize: 17 }}>
-            Créer mon compte gratuitement
+            Create my free account
           </Text>
         </TouchableOpacity>
       </View>
@@ -267,23 +267,23 @@ function Step2({
         </View>
 
         <Text style={{ fontSize: 26, fontWeight: '700', color: INK, marginBottom: 4 }}>
-          Votre profil
+          Your profile
         </Text>
         <Text style={{ fontSize: 14, color: INK_LIGHT, marginBottom: 28, lineHeight: 20 }}>
-          Ces informations nous permettent de personnaliser votre expérience.
+          This information helps us personalize your experience.
         </Text>
 
-        <Field label="Prénom et nom *" value={form.name} onChange={set('name')} placeholder="Alex Schmidt" />
+        <Field label="Full name *" value={form.name} onChange={set('name')} placeholder="Alex Schmidt" />
         <Field label="Email *" value={form.email} onChange={set('email')} placeholder="alex@email.com" keyboardType="email-address" autoCapitalize="none" />
-        <Field label="Téléphone" value={form.phone} onChange={set('phone')} placeholder="+41 79 123 45 67" keyboardType="phone-pad" />
-        <Field label="Hôtel / Logement" value={form.hotelName} onChange={set('hotelName')} placeholder="Hotel Eiger, Grindelwald" />
+        <Field label="Phone" value={form.phone} onChange={set('phone')} placeholder="+41 79 123 45 67" keyboardType="phone-pad" />
+        <Field label="Hotel / Accommodation" value={form.hotelName} onChange={set('hotelName')} placeholder="Hotel Eiger, Grindelwald" />
 
         <View style={{ flexDirection: 'row', gap: 12 }}>
           <View style={{ flex: 1 }}>
-            <Field label="Arrivée" value={form.stayStart} onChange={set('stayStart')} placeholder="2026-07-15" />
+            <Field label="Check-in" value={form.stayStart} onChange={set('stayStart')} placeholder="2026-07-15" />
           </View>
           <View style={{ flex: 1 }}>
-            <Field label="Départ" value={form.stayEnd} onChange={set('stayEnd')} placeholder="2026-07-20" />
+            <Field label="Check-out" value={form.stayEnd} onChange={set('stayEnd')} placeholder="2026-07-20" />
           </View>
         </View>
 
@@ -296,7 +296,7 @@ function Step2({
           marginBottom: 8,
         }}>
           <Text style={{ fontSize: 12, fontWeight: '600', color: TEAL, marginBottom: 8, letterSpacing: 0.5 }}>
-            CODE DE PARRAINAGE (optionnel)
+            REFERRAL CODE (optional)
           </Text>
           <TextInput
             value={form.referralCodeEntered}
@@ -310,7 +310,7 @@ function Step2({
             }}
           />
           <Text style={{ fontSize: 11, color: INK_LIGHT, marginTop: 6 }}>
-            Entrez le code d'un ami pour obtenir 5 LAKE bonus chacun.
+            Enter a friend's code to get 5 bonus LAKE each.
           </Text>
         </View>
 
@@ -336,7 +336,7 @@ function Step2({
           }}
         >
           <Text style={{ color: WHITE, fontWeight: '700', fontSize: 17 }}>
-            {loading ? 'Création en cours…' : 'Créer mon compte'}
+            {loading ? 'Creating account…' : 'Create my account'}
           </Text>
         </TouchableOpacity>
       </ScrollView>
@@ -385,7 +385,7 @@ function Step3({
           <View style={{ flex: 1 }}>
             <Text style={{ color: WHITE, fontWeight: '600', fontSize: 14 }}>EtherLaken</Text>
             <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, marginTop: 1 }}>
-              Bienvenue ! Vous avez 5 GreenTokens offerts 🎉
+              Welcome! You have 5 LAKE tokens as a gift 🎉
             </Text>
           </View>
         </View>
@@ -406,10 +406,10 @@ function Step3({
 
         <YStack style={{ alignItems: 'center' }} gap="$2">
           <Text style={{ fontSize: 28, fontWeight: '700', color: INK, textAlign: 'center' }}>
-            Compte créé !
+            Account created!
           </Text>
           <Text style={{ fontSize: 15, color: INK_LIGHT, textAlign: 'center', lineHeight: 22 }}>
-            Vous avez reçu 5 GreenTokens de bienvenue.{'\n'}Commencez à explorer les offres durables.
+            You received 5 welcome LAKE tokens.{'\n'}Start exploring sustainable offers.
           </Text>
         </YStack>
 
@@ -425,7 +425,7 @@ function Step3({
           width: '100%',
         }}>
           <Text style={{ fontSize: 11, fontWeight: '600', color: TEAL, letterSpacing: 1.5, marginBottom: 8 }}>
-            VOTRE CODE DE PARRAINAGE
+            YOUR REFERRAL CODE
           </Text>
           <Text style={{
             fontSize: 28, fontWeight: '800', color: TEAL,
@@ -434,7 +434,7 @@ function Step3({
             {referralCode}
           </Text>
           <Text style={{ fontSize: 12, color: INK_LIGHT, marginTop: 8, textAlign: 'center' }}>
-            Partagez ce code et gagnez 10 LAKE par ami parrainé.
+            Share this code and earn 10 LAKE per friend referred.
           </Text>
         </View>
       </YStack>
@@ -455,7 +455,7 @@ function Step3({
           }}
         >
           <Text style={{ color: WHITE, fontWeight: '700', fontSize: 17 }}>
-            Explorer les offres →
+            Explore offers →
           </Text>
         </TouchableOpacity>
       </View>
